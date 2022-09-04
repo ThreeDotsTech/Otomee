@@ -1,0 +1,1 @@
+export const MAIN_ORBITDB_ADDRESSS = "/orbitdb/zdpuB2VDcA4v3m7P4HaWWp8qfHze4XZut32HcYAt7VnPuR1ef/otomee-orderbook-alpha.v0"

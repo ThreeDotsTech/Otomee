@@ -2,7 +2,7 @@ import { SupportedChainId } from '../constants/chains'
 
 const ETHERSCAN_PREFIXES: { [chainId: number]: string } = {
   [SupportedChainId.MAINNET]: '',
-  [SupportedChainId.RINKEBY]: 'rinkeby.',
+  [SupportedChainId.GOERLI]: 'goerli.',
 }
 
 export enum ExplorerDataType {

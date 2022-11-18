@@ -19,24 +19,24 @@ export const ENS_REGISTRAR_ADDRESSES: AddressMap = {
   [SupportedChainId.GOERLI]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
 }
 
-export const OTOMEE_REGISTRY_ADDRESSES: AddressMap = {
+export const STATESWAP_REGISTRY_ADDRESSES: AddressMap = {
   [SupportedChainId.MAINNET]: '0xa5409ec958c83c3f309868babaca7c86dcb077c1', //OS Registry. CHANGE!
-  [SupportedChainId.GOERLI]: '0x30caa00562AD2f2B41BB4b1943d28F84832ce0D6', //TODO: Migrate to Stateswap
+  [SupportedChainId.GOERLI]: '0x22B46404a3DE839B87186317319a7d3d8eeF2B53',
 }
 
-export const OTOMEE_EXCHANGE_ADDRESSES: AddressMap = {
+export const STATESWAP_EXCHANGE_ADDRESSES: AddressMap = {
   [SupportedChainId.MAINNET]: '0xb020e4899a06Bda2D4dC010C6c23cfcC1e75b307', //UNDEFINED UNTIL DEPLOYED!
-  [SupportedChainId.GOERLI]: '0xF40D3F036528Ed87b83748306c719757f22be4fE', //TODO: Migrate to Stateswap
+  [SupportedChainId.GOERLI]: '0x327113485E4110Db061C17017aC213cD234Bb0E8',
 }
 
-export const OTOMEE_ATOMIZICER_ADDRESSES: AddressMap = {
+export const STATESWAP_ATOMIZICER_ADDRESSES: AddressMap = {
   [SupportedChainId.MAINNET]: '0x4f1e8f81e21Fd54CeFDEC1aAe7f328E950b31A09', //UNDEFINED UNTIL DEPLOYED!
-  [SupportedChainId.GOERLI]: '0x4f1e8f81e21Fd54CeFDEC1aAe7f328E950b31A09', //TODO: Migrate to Stateswap
+  [SupportedChainId.GOERLI]: '0xe54Df82cBb61863987B20BAb6642347961B5738d',
 }
 
-export const OTOMEE_STATIC_ADDRESSES: AddressMap = {
+export const STATESWAP_STATIC_ADDRESSES: AddressMap = {
   [SupportedChainId.MAINNET]: '0x31c8b26B5eF7E10C001aD35eADc33ea771819978', //UNDEFINED UNTIL DEPLOYED!
-  [SupportedChainId.GOERLI]: '0x31c8b26B5eF7E10C001aD35eADc33ea771819978', //TODO: Migrate to Stateswap
+  [SupportedChainId.GOERLI]: '0x98c4d5D255A150df28a791E0d8DCCFff07aaE6f2',
 }
 
 export const MULTICALL_ADDRESS: AddressMap = {

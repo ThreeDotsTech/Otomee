@@ -19,10 +19,10 @@ import {
   ARGENT_WALLET_DETECTOR_ADDRESS,
   ENS_REGISTRAR_ADDRESSES,
   MULTICALL_ADDRESS,
-  OTOMEE_REGISTRY_ADDRESSES,
-  OTOMEE_EXCHANGE_ADDRESSES,
-  OTOMEE_ATOMIZICER_ADDRESSES,
-  OTOMEE_STATIC_ADDRESSES
+  STATESWAP_REGISTRY_ADDRESSES,
+  STATESWAP_EXCHANGE_ADDRESSES,
+  STATESWAP_ATOMIZICER_ADDRESSES,
+  STATESWAP_STATIC_ADDRESSES
 } from '../constants/addresses'
 import { useMemo } from 'react'
 import { getContract } from '../utils'
@@ -80,19 +80,19 @@ export function useENSRegistrarContract(withSignerIfPossible?: boolean) {
 }
 
 export function useOtomeeRegistryContract(withSignerIfPossible?: boolean) {
-  return useContract<OtomeeRegistry>(OTOMEE_REGISTRY_ADDRESSES, REGISTRY_ABI, withSignerIfPossible)
+  return useContract<OtomeeRegistry>(STATESWAP_REGISTRY_ADDRESSES, REGISTRY_ABI, withSignerIfPossible)
 }
 
 export function useOtomeeExchangeContract(withSignerIfPossible?: boolean) {
-  return useContract<OtomeeExchange>(OTOMEE_EXCHANGE_ADDRESSES, EXCHANGE_ABI, withSignerIfPossible)
+  return useContract<OtomeeExchange>(STATESWAP_EXCHANGE_ADDRESSES, EXCHANGE_ABI, withSignerIfPossible)
 }
 
 export function useOtomeeAtomizicerContract(withSignerIfPossible?: boolean) {
-  return useContract<OtomeeAtomicizer>(OTOMEE_ATOMIZICER_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
+  return useContract<OtomeeAtomicizer>(STATESWAP_ATOMIZICER_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
 }
 
 export function useOtomeeStaticContract(withSignerIfPossible?: boolean) {
-  return useContract<OtomeeStatic>(OTOMEE_STATIC_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
+  return useContract<OtomeeStatic>(STATESWAP_STATIC_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
 }
 
 

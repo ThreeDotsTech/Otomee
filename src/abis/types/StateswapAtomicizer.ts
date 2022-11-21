@@ -17,7 +17,7 @@ import { FunctionFragment, Result } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface OtomeeAtomicizerInterface extends utils.Interface {
+export interface StateswapAtomicizerInterface extends utils.Interface {
   functions: {
     "atomicize(address[],uint256[],uint256[],bytes)": FunctionFragment;
   };
@@ -32,12 +32,12 @@ export interface OtomeeAtomicizerInterface extends utils.Interface {
   events: {};
 }
 
-export interface OtomeeAtomicizer extends BaseContract {
+export interface StateswapAtomicizer extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: OtomeeAtomicizerInterface;
+  interface: StateswapAtomicizerInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,

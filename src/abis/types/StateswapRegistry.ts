@@ -16,7 +16,7 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface OtomeeRegistryInterface extends utils.Interface {
+export interface StateswapRegistryInterface extends utils.Interface {
   functions: {
     "DELAY_PERIOD()": FunctionFragment;
     "contracts(address)": FunctionFragment;
@@ -169,12 +169,12 @@ export type OwnershipTransferredEvent = TypedEvent<
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
 
-export interface OtomeeRegistry extends BaseContract {
+export interface StateswapRegistry extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: OtomeeRegistryInterface;
+  interface: StateswapRegistryInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -202,6 +202,11 @@ export interface OtomeeRegistry extends BaseContract {
 
     delegateProxyImplementation(overrides?: CallOverrides): Promise<[string]>;
 
+    /**
+     * ProxyRegistry owner only
+     * End the process to enable access for specified contract after delay period has passed.
+     * @param addr Address to which to grant permissions
+     */
     endGrantAuthentication(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -211,50 +216,89 @@ export interface OtomeeRegistry extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
+    /**
+     * Returns the address of the current owner.
+     */
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     pending(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     proxies(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
+    /**
+     * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+     * Register a proxy contract with this registry
+     */
     registerProxy(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    /**
+     * Can be called by any user
+     * Register a proxy contract with this registry
+     */
     registerProxyFor(
       user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    /**
+     * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+     * Register a proxy contract with this registry, overriding any existing proxy
+     */
     registerProxyOverride(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    /**
+     * Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.
+     */
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    /**
+     * ProxyRegistry owner only
+     * Revoke access for specified contract. Can be done instantly.
+     * @param addr Address of which to revoke permissions
+     */
     revokeAuthentication(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    /**
+     * ProxyRegistry owner only
+     * Start the process to enable access for specified contract. Subject to delay period.
+     * @param addr Address to which to grant permissions
+     */
     startGrantAuthentication(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    /**
+     * Transfer access
+     */
     transferAccessTo(
       from: string,
       to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    /**
+     * Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.
+     */
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    /**
+     * No delay, can only be called once - after that the standard registry process with a delay must be used
+     * Grant authentication to the initial Exchange protocol contract
+     * @param authAddress Address of the contract to grant authentication
+     */
     grantInitialAuthentication(
       authAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -267,6 +311,11 @@ export interface OtomeeRegistry extends BaseContract {
 
   delegateProxyImplementation(overrides?: CallOverrides): Promise<string>;
 
+  /**
+   * ProxyRegistry owner only
+   * End the process to enable access for specified contract after delay period has passed.
+   * @param addr Address to which to grant permissions
+   */
   endGrantAuthentication(
     addr: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -276,50 +325,89 @@ export interface OtomeeRegistry extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
+  /**
+   * Returns the address of the current owner.
+   */
   owner(overrides?: CallOverrides): Promise<string>;
 
   pending(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   proxies(arg0: string, overrides?: CallOverrides): Promise<string>;
 
+  /**
+   * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+   * Register a proxy contract with this registry
+   */
   registerProxy(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  /**
+   * Can be called by any user
+   * Register a proxy contract with this registry
+   */
   registerProxyFor(
     user: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  /**
+   * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+   * Register a proxy contract with this registry, overriding any existing proxy
+   */
   registerProxyOverride(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  /**
+   * Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.
+   */
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  /**
+   * ProxyRegistry owner only
+   * Revoke access for specified contract. Can be done instantly.
+   * @param addr Address of which to revoke permissions
+   */
   revokeAuthentication(
     addr: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  /**
+   * ProxyRegistry owner only
+   * Start the process to enable access for specified contract. Subject to delay period.
+   * @param addr Address to which to grant permissions
+   */
   startGrantAuthentication(
     addr: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  /**
+   * Transfer access
+   */
   transferAccessTo(
     from: string,
     to: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  /**
+   * Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.
+   */
   transferOwnership(
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  /**
+   * No delay, can only be called once - after that the standard registry process with a delay must be used
+   * Grant authentication to the initial Exchange protocol contract
+   * @param authAddress Address of the contract to grant authentication
+   */
   grantInitialAuthentication(
     authAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -332,6 +420,11 @@ export interface OtomeeRegistry extends BaseContract {
 
     delegateProxyImplementation(overrides?: CallOverrides): Promise<string>;
 
+    /**
+     * ProxyRegistry owner only
+     * End the process to enable access for specified contract after delay period has passed.
+     * @param addr Address to which to grant permissions
+     */
     endGrantAuthentication(
       addr: string,
       overrides?: CallOverrides
@@ -341,41 +434,80 @@ export interface OtomeeRegistry extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
+    /**
+     * Returns the address of the current owner.
+     */
     owner(overrides?: CallOverrides): Promise<string>;
 
     pending(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     proxies(arg0: string, overrides?: CallOverrides): Promise<string>;
 
+    /**
+     * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+     * Register a proxy contract with this registry
+     */
     registerProxy(overrides?: CallOverrides): Promise<string>;
 
+    /**
+     * Can be called by any user
+     * Register a proxy contract with this registry
+     */
     registerProxyFor(user: string, overrides?: CallOverrides): Promise<string>;
 
+    /**
+     * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+     * Register a proxy contract with this registry, overriding any existing proxy
+     */
     registerProxyOverride(overrides?: CallOverrides): Promise<string>;
 
+    /**
+     * Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.
+     */
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
+    /**
+     * ProxyRegistry owner only
+     * Revoke access for specified contract. Can be done instantly.
+     * @param addr Address of which to revoke permissions
+     */
     revokeAuthentication(
       addr: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
+    /**
+     * ProxyRegistry owner only
+     * Start the process to enable access for specified contract. Subject to delay period.
+     * @param addr Address to which to grant permissions
+     */
     startGrantAuthentication(
       addr: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
+    /**
+     * Transfer access
+     */
     transferAccessTo(
       from: string,
       to: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
+    /**
+     * Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.
+     */
     transferOwnership(
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
+    /**
+     * No delay, can only be called once - after that the standard registry process with a delay must be used
+     * Grant authentication to the initial Exchange protocol contract
+     * @param authAddress Address of the contract to grant authentication
+     */
     grantInitialAuthentication(
       authAddress: string,
       overrides?: CallOverrides
@@ -400,6 +532,11 @@ export interface OtomeeRegistry extends BaseContract {
 
     delegateProxyImplementation(overrides?: CallOverrides): Promise<BigNumber>;
 
+    /**
+     * ProxyRegistry owner only
+     * End the process to enable access for specified contract after delay period has passed.
+     * @param addr Address to which to grant permissions
+     */
     endGrantAuthentication(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -409,50 +546,89 @@ export interface OtomeeRegistry extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
+    /**
+     * Returns the address of the current owner.
+     */
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     pending(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     proxies(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    /**
+     * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+     * Register a proxy contract with this registry
+     */
     registerProxy(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    /**
+     * Can be called by any user
+     * Register a proxy contract with this registry
+     */
     registerProxyFor(
       user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    /**
+     * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+     * Register a proxy contract with this registry, overriding any existing proxy
+     */
     registerProxyOverride(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    /**
+     * Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.
+     */
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    /**
+     * ProxyRegistry owner only
+     * Revoke access for specified contract. Can be done instantly.
+     * @param addr Address of which to revoke permissions
+     */
     revokeAuthentication(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    /**
+     * ProxyRegistry owner only
+     * Start the process to enable access for specified contract. Subject to delay period.
+     * @param addr Address to which to grant permissions
+     */
     startGrantAuthentication(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    /**
+     * Transfer access
+     */
     transferAccessTo(
       from: string,
       to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    /**
+     * Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.
+     */
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    /**
+     * No delay, can only be called once - after that the standard registry process with a delay must be used
+     * Grant authentication to the initial Exchange protocol contract
+     * @param authAddress Address of the contract to grant authentication
+     */
     grantInitialAuthentication(
       authAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -471,6 +647,11 @@ export interface OtomeeRegistry extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * ProxyRegistry owner only
+     * End the process to enable access for specified contract after delay period has passed.
+     * @param addr Address to which to grant permissions
+     */
     endGrantAuthentication(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -480,6 +661,9 @@ export interface OtomeeRegistry extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    /**
+     * Returns the address of the current owner.
+     */
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pending(
@@ -492,44 +676,80 @@ export interface OtomeeRegistry extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+     * Register a proxy contract with this registry
+     */
     registerProxy(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * Can be called by any user
+     * Register a proxy contract with this registry
+     */
     registerProxyFor(
       user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * Must be called by the user which the proxy is for, creates a new AuthenticatedProxy
+     * Register a proxy contract with this registry, overriding any existing proxy
+     */
     registerProxyOverride(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.
+     */
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * ProxyRegistry owner only
+     * Revoke access for specified contract. Can be done instantly.
+     * @param addr Address of which to revoke permissions
+     */
     revokeAuthentication(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * ProxyRegistry owner only
+     * Start the process to enable access for specified contract. Subject to delay period.
+     * @param addr Address to which to grant permissions
+     */
     startGrantAuthentication(
       addr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * Transfer access
+     */
     transferAccessTo(
       from: string,
       to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.
+     */
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    /**
+     * No delay, can only be called once - after that the standard registry process with a delay must be used
+     * Grant authentication to the initial Exchange protocol contract
+     * @param authAddress Address of the contract to grant authentication
+     */
     grantInitialAuthentication(
       authAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }

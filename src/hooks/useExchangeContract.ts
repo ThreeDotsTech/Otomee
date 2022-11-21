@@ -4,7 +4,7 @@ import { ArrayToNumber } from "utils";
 import { encodeFunctionSignature } from "utils/encoders";
 import { Call, Order, OrderType, OrderWrapper } from "types/orders";
 import { useERC20Contract, useOtomeeAtomizicerContract } from "./useContract";
-import { Erc20, Erc721, OtomeeAtomicizer } from "abis/types";
+import { Erc20, Erc721, StateswapAtomicizer } from "abis/types";
 import { BigNumber } from "ethers";
 
 function createCalldata_receive_ETH(amount: BigNumber) {
@@ -127,7 +127,7 @@ export function create_ERC20_ERC721_OfferWithFees({
     expirationTime: number,
     chainId: number,
     erc20c: Erc20 | null,
-    atomicizerc: OtomeeAtomicizer | null
+    atomicizerc: StateswapAtomicizer | null
 }): OrderWrapper {
     const fee1 = ((erc20Amount.mul(protocolFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
     const fee2 = ((erc20Amount.mul(creatorFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
@@ -255,7 +255,7 @@ export function create_ERC721_ERC20_OR_ETH_Offer_Feeless({
     expirationTime: number,
     chainId: number,
     erc721c: Erc721 | null,
-    atomicizerc: OtomeeAtomicizer | null
+    atomicizerc: StateswapAtomicizer | null
 }): OrderWrapper {
 
     const extradataSelector = encodeFunctionSignature(
@@ -369,7 +369,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
     expirationTime: number,
     chainId: number,
     erc721c: Erc721 | null,
-    atomicizerc: OtomeeAtomicizer | null
+    atomicizerc: StateswapAtomicizer | null
 }): OrderWrapper {
     const fee1 = ((price.mul(protocolFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
     const fee2 = ((price.mul(creatorFee).mul(10).div(1000)).add(5)).div(10) //CreatorFee

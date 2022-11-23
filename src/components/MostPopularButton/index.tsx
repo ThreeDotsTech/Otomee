@@ -10,7 +10,7 @@ export const MostPopularButton = ({ i }: { i: number }) => {
     const { name, supply, loading } = useERC721Data(mostPopular[i] ? mostPopular[i][0] : '')
     const history = useHistory()
     function gotoCollectionPage() {
-        history.push('/collection/' + mostPopular[i] ? mostPopular[i][0] : '')
+        history.push('/collection/' + (mostPopular[i] ? mostPopular[i][0] : ''))
     }
     const name_contract: string = mostPopular[i] ? mostPopular[i][0] : ''
 

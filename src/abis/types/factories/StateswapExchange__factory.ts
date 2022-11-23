@@ -5,9 +5,9 @@
 import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
 import type {
-  OtomeeExchange,
-  OtomeeExchangeInterface,
-} from "../OtomeeExchange";
+  StateswapExchange,
+  StateswapExchangeInterface,
+} from "../StateswapExchange";
 
 const _abi = [
   {
@@ -55,19 +55,19 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
-        name: "staticTarget",
+        name: "verifierTarget",
         type: "address",
       },
       {
         indexed: false,
         internalType: "bytes4",
-        name: "staticSelector",
+        name: "verifierSelector",
         type: "bytes4",
       },
       {
         indexed: false,
         internalType: "bytes",
-        name: "staticExtradata",
+        name: "verifierExtradata",
         type: "bytes",
       },
       {
@@ -205,17 +205,17 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "staticTarget",
+        name: "verifierTarget",
         type: "address",
       },
       {
         internalType: "bytes4",
-        name: "staticSelector",
+        name: "verifierSelector",
         type: "bytes4",
       },
       {
         internalType: "bytes",
-        name: "staticExtradata",
+        name: "verifierExtradata",
         type: "bytes",
       },
       {
@@ -277,102 +277,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256[16]",
-        name: "uints",
-        type: "uint256[16]",
-      },
-      {
-        internalType: "bytes4[2]",
-        name: "staticSelectors",
-        type: "bytes4[2]",
-      },
-      {
-        internalType: "bytes",
-        name: "firstExtradata",
-        type: "bytes",
-      },
-      {
-        internalType: "bytes",
-        name: "firstCalldata",
-        type: "bytes",
-      },
-      {
-        internalType: "bytes",
-        name: "secondExtradata",
-        type: "bytes",
-      },
-      {
-        internalType: "bytes",
-        name: "secondCalldata",
-        type: "bytes",
-      },
-      {
-        internalType: "uint8[2]",
-        name: "howToCalls",
-        type: "uint8[2]",
-      },
-      {
-        internalType: "bytes32",
-        name: "metadata",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes",
-        name: "signatures",
-        type: "bytes",
-      },
-    ],
-    name: "excecuteTrade_",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-    payable: true,
-  },
-  {
-    inputs: [],
-    name: "fee",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-    constant: true,
-  },
-  {
-    inputs: [],
-    name: "feeSetter",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-    constant: true,
-  },
-  {
-    inputs: [],
-    name: "feeTo",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-    constant: true,
-  },
-  {
-    inputs: [
-      {
         internalType: "address",
         name: "",
         type: "address",
@@ -409,17 +313,17 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "staticTarget",
+        name: "verifierTarget",
         type: "address",
       },
       {
         internalType: "bytes4",
-        name: "staticSelector",
+        name: "verifierSelector",
         type: "bytes4",
       },
       {
         internalType: "bytes",
-        name: "staticExtradata",
+        name: "verifierExtradata",
         type: "bytes",
       },
       {
@@ -490,20 +394,6 @@ const _abi = [
     constant: true,
   },
   {
-    inputs: [],
-    name: "refundPercentage",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-    constant: true,
-  },
-  {
     inputs: [
       {
         internalType: "address",
@@ -526,45 +416,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "_fee",
-        type: "uint256",
-      },
-    ],
-    name: "setFee",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_feeTo",
-        type: "address",
-      },
-    ],
-    name: "setFeeTo",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_feeSetter",
-        type: "address",
-      },
-    ],
-    name: "setFeeToSetter",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "bytes32",
         name: "hash",
         type: "bytes32",
@@ -583,15 +434,56 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "_refundPercentage",
-        type: "uint256",
+        internalType: "uint256[16]",
+        name: "uints",
+        type: "uint256[16]",
+      },
+      {
+        internalType: "bytes4[2]",
+        name: "verifierSelectors",
+        type: "bytes4[2]",
+      },
+      {
+        internalType: "bytes",
+        name: "firstExtradata",
+        type: "bytes",
+      },
+      {
+        internalType: "bytes",
+        name: "firstCalldata",
+        type: "bytes",
+      },
+      {
+        internalType: "bytes",
+        name: "secondExtradata",
+        type: "bytes",
+      },
+      {
+        internalType: "bytes",
+        name: "secondCalldata",
+        type: "bytes",
+      },
+      {
+        internalType: "uint8[2]",
+        name: "howToCalls",
+        type: "uint8[2]",
+      },
+      {
+        internalType: "bytes32",
+        name: "metadata",
+        type: "bytes32",
+      },
+      {
+        internalType: "bytes",
+        name: "signatures",
+        type: "bytes",
       },
     ],
-    name: "setrefundPercentage",
+    name: "stateswap_",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
+    payable: true,
   },
   {
     inputs: [
@@ -637,17 +529,17 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "staticTarget",
+        name: "verifierTarget",
         type: "address",
       },
       {
         internalType: "bytes4",
-        name: "staticSelector",
+        name: "verifierSelector",
         type: "bytes4",
       },
       {
         internalType: "bytes",
-        name: "staticExtradata",
+        name: "verifierExtradata",
         type: "bytes",
       },
       {
@@ -699,15 +591,15 @@ const _abi = [
   },
 ];
 
-export class OtomeeExchange__factory {
+export class StateswapExchange__factory {
   static readonly abi = _abi;
-  static createInterface(): OtomeeExchangeInterface {
-    return new utils.Interface(_abi) as OtomeeExchangeInterface;
+  static createInterface(): StateswapExchangeInterface {
+    return new utils.Interface(_abi) as StateswapExchangeInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): OtomeeExchange {
-    return new Contract(address, _abi, signerOrProvider) as OtomeeExchange;
+  ): StateswapExchange {
+    return new Contract(address, _abi, signerOrProvider) as StateswapExchange;
   }
 }

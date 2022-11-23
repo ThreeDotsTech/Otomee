@@ -5,9 +5,9 @@
 import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
 import type {
-  OtomeeRegistry,
-  OtomeeRegistryInterface,
-} from "../OtomeeRegistry";
+  StateswapRegistry,
+  StateswapRegistryInterface,
+} from "../StateswapRegistry";
 
 const _abi = [
   {
@@ -301,15 +301,15 @@ const _abi = [
   },
 ];
 
-export class OtomeeRegistry__factory {
+export class StateswapRegistry__factory {
   static readonly abi = _abi;
-  static createInterface(): OtomeeRegistryInterface {
-    return new utils.Interface(_abi) as OtomeeRegistryInterface;
+  static createInterface(): StateswapRegistryInterface {
+    return new utils.Interface(_abi) as StateswapRegistryInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): OtomeeRegistry {
-    return new Contract(address, _abi, signerOrProvider) as OtomeeRegistry;
+  ): StateswapRegistry {
+    return new Contract(address, _abi, signerOrProvider) as StateswapRegistry;
   }
 }

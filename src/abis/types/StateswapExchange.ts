@@ -18,26 +18,18 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface OtomeeExchangeInterface extends utils.Interface {
+export interface StateswapExchangeInterface extends utils.Interface {
   functions: {
     "approveOrderHash_(bytes32)": FunctionFragment;
     "approveOrder_(address,address,address,bytes4,bytes,uint256,uint256,uint256,uint256,bool)": FunctionFragment;
     "approved(address,bytes32)": FunctionFragment;
-    "excecuteTrade_(uint256[16],bytes4[2],bytes,bytes,bytes,bytes,uint8[2],bytes32,bytes)": FunctionFragment;
-    "fee()": FunctionFragment;
-    "feeSetter()": FunctionFragment;
-    "feeTo()": FunctionFragment;
     "fills(address,bytes32)": FunctionFragment;
     "hashOrder_(address,address,address,bytes4,bytes,uint256,uint256,uint256,uint256)": FunctionFragment;
     "hashToSign_(bytes32)": FunctionFragment;
     "name()": FunctionFragment;
-    "refundPercentage()": FunctionFragment;
     "registries(address)": FunctionFragment;
-    "setFee(uint256)": FunctionFragment;
-    "setFeeTo(address)": FunctionFragment;
-    "setFeeToSetter(address)": FunctionFragment;
     "setOrderFill_(bytes32,uint256)": FunctionFragment;
-    "setrefundPercentage(uint256)": FunctionFragment;
+    "stateswap_(uint256[16],bytes4[2],bytes,bytes,bytes,bytes,uint8[2],bytes32,bytes)": FunctionFragment;
     "validateOrderAuthorization_(bytes32,address,bytes)": FunctionFragment;
     "validateOrderParameters_(address,address,address,bytes4,bytes,uint256,uint256,uint256,uint256)": FunctionFragment;
     "version()": FunctionFragment;
@@ -67,23 +59,6 @@ export interface OtomeeExchangeInterface extends utils.Interface {
     values: [string, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "excecuteTrade_",
-    values: [
-      BigNumberish[],
-      [BytesLike, BytesLike],
-      BytesLike,
-      BytesLike,
-      BytesLike,
-      BytesLike,
-      [BigNumberish, BigNumberish],
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(functionFragment: "fee", values?: undefined): string;
-  encodeFunctionData(functionFragment: "feeSetter", values?: undefined): string;
-  encodeFunctionData(functionFragment: "feeTo", values?: undefined): string;
-  encodeFunctionData(
     functionFragment: "fills",
     values: [string, BytesLike]
   ): string;
@@ -106,27 +81,24 @@ export interface OtomeeExchangeInterface extends utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "refundPercentage",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "registries", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "setFee",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "setFeeTo", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "setFeeToSetter",
-    values: [string]
-  ): string;
   encodeFunctionData(
     functionFragment: "setOrderFill_",
     values: [BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setrefundPercentage",
-    values: [BigNumberish]
+    functionFragment: "stateswap_",
+    values: [
+      BigNumberish[],
+      [BytesLike, BytesLike],
+      BytesLike,
+      BytesLike,
+      BytesLike,
+      BytesLike,
+      [BigNumberish, BigNumberish],
+      BytesLike,
+      BytesLike
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "validateOrderAuthorization_",
@@ -157,13 +129,6 @@ export interface OtomeeExchangeInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "approved", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "excecuteTrade_",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "fee", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "feeSetter", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "feeTo", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "fills", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "hashOrder_", data: BytesLike): Result;
   decodeFunctionResult(
@@ -171,25 +136,12 @@ export interface OtomeeExchangeInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "refundPercentage",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "registries", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setFee", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setFeeTo", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setFeeToSetter",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "setOrderFill_",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "setrefundPercentage",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "stateswap_", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "validateOrderAuthorization_",
     data: BytesLike
@@ -229,9 +181,9 @@ export type OrderApprovedEvent = TypedEvent<
     hash: string;
     registry: string;
     maker: string;
-    staticTarget: string;
-    staticSelector: string;
-    staticExtradata: string;
+    verifierTarget: string;
+    verifierSelector: string;
+    verifierExtradata: string;
     maximumFill: BigNumber;
     listingTime: BigNumber;
     expirationTime: BigNumber;
@@ -265,12 +217,12 @@ export type OrdersMatchedEvent = TypedEvent<
 
 export type OrdersMatchedEventFilter = TypedEventFilter<OrdersMatchedEvent>;
 
-export interface OtomeeExchange extends BaseContract {
+export interface StateswapExchange extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: OtomeeExchangeInterface;
+  interface: StateswapExchangeInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -300,9 +252,9 @@ export interface OtomeeExchange extends BaseContract {
     approveOrder_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -317,25 +269,6 @@ export interface OtomeeExchange extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    excecuteTrade_(
-      uints: BigNumberish[],
-      staticSelectors: [BytesLike, BytesLike],
-      firstExtradata: BytesLike,
-      firstCalldata: BytesLike,
-      secondExtradata: BytesLike,
-      secondCalldata: BytesLike,
-      howToCalls: [BigNumberish, BigNumberish],
-      metadata: BytesLike,
-      signatures: BytesLike,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    fee(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    feeSetter(overrides?: CallOverrides): Promise<[string]>;
-
-    feeTo(overrides?: CallOverrides): Promise<[string]>;
-
     fills(
       arg0: string,
       arg1: BytesLike,
@@ -345,9 +278,9 @@ export interface OtomeeExchange extends BaseContract {
     hashOrder_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -362,24 +295,7 @@ export interface OtomeeExchange extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    refundPercentage(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     registries(arg0: string, overrides?: CallOverrides): Promise<[boolean]>;
-
-    setFee(
-      _fee: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setFeeTo(
-      _feeTo: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setFeeToSetter(
-      _feeSetter: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     setOrderFill_(
       hash: BytesLike,
@@ -387,9 +303,17 @@ export interface OtomeeExchange extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setrefundPercentage(
-      _refundPercentage: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    stateswap_(
+      uints: BigNumberish[],
+      verifierSelectors: [BytesLike, BytesLike],
+      firstExtradata: BytesLike,
+      firstCalldata: BytesLike,
+      secondExtradata: BytesLike,
+      secondCalldata: BytesLike,
+      howToCalls: [BigNumberish, BigNumberish],
+      metadata: BytesLike,
+      signatures: BytesLike,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     validateOrderAuthorization_(
@@ -402,9 +326,9 @@ export interface OtomeeExchange extends BaseContract {
     validateOrderParameters_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -423,9 +347,9 @@ export interface OtomeeExchange extends BaseContract {
   approveOrder_(
     registry: string,
     maker: string,
-    staticTarget: string,
-    staticSelector: BytesLike,
-    staticExtradata: BytesLike,
+    verifierTarget: string,
+    verifierSelector: BytesLike,
+    verifierExtradata: BytesLike,
     maximumFill: BigNumberish,
     listingTime: BigNumberish,
     expirationTime: BigNumberish,
@@ -440,25 +364,6 @@ export interface OtomeeExchange extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  excecuteTrade_(
-    uints: BigNumberish[],
-    staticSelectors: [BytesLike, BytesLike],
-    firstExtradata: BytesLike,
-    firstCalldata: BytesLike,
-    secondExtradata: BytesLike,
-    secondCalldata: BytesLike,
-    howToCalls: [BigNumberish, BigNumberish],
-    metadata: BytesLike,
-    signatures: BytesLike,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  fee(overrides?: CallOverrides): Promise<BigNumber>;
-
-  feeSetter(overrides?: CallOverrides): Promise<string>;
-
-  feeTo(overrides?: CallOverrides): Promise<string>;
-
   fills(
     arg0: string,
     arg1: BytesLike,
@@ -468,9 +373,9 @@ export interface OtomeeExchange extends BaseContract {
   hashOrder_(
     registry: string,
     maker: string,
-    staticTarget: string,
-    staticSelector: BytesLike,
-    staticExtradata: BytesLike,
+    verifierTarget: string,
+    verifierSelector: BytesLike,
+    verifierExtradata: BytesLike,
     maximumFill: BigNumberish,
     listingTime: BigNumberish,
     expirationTime: BigNumberish,
@@ -482,24 +387,7 @@ export interface OtomeeExchange extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  refundPercentage(overrides?: CallOverrides): Promise<BigNumber>;
-
   registries(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-  setFee(
-    _fee: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setFeeTo(
-    _feeTo: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setFeeToSetter(
-    _feeSetter: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   setOrderFill_(
     hash: BytesLike,
@@ -507,9 +395,17 @@ export interface OtomeeExchange extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setrefundPercentage(
-    _refundPercentage: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+  stateswap_(
+    uints: BigNumberish[],
+    verifierSelectors: [BytesLike, BytesLike],
+    firstExtradata: BytesLike,
+    firstCalldata: BytesLike,
+    secondExtradata: BytesLike,
+    secondCalldata: BytesLike,
+    howToCalls: [BigNumberish, BigNumberish],
+    metadata: BytesLike,
+    signatures: BytesLike,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   validateOrderAuthorization_(
@@ -522,9 +418,9 @@ export interface OtomeeExchange extends BaseContract {
   validateOrderParameters_(
     registry: string,
     maker: string,
-    staticTarget: string,
-    staticSelector: BytesLike,
-    staticExtradata: BytesLike,
+    verifierTarget: string,
+    verifierSelector: BytesLike,
+    verifierExtradata: BytesLike,
     maximumFill: BigNumberish,
     listingTime: BigNumberish,
     expirationTime: BigNumberish,
@@ -543,9 +439,9 @@ export interface OtomeeExchange extends BaseContract {
     approveOrder_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -560,25 +456,6 @@ export interface OtomeeExchange extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    excecuteTrade_(
-      uints: BigNumberish[],
-      staticSelectors: [BytesLike, BytesLike],
-      firstExtradata: BytesLike,
-      firstCalldata: BytesLike,
-      secondExtradata: BytesLike,
-      secondCalldata: BytesLike,
-      howToCalls: [BigNumberish, BigNumberish],
-      metadata: BytesLike,
-      signatures: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    fee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    feeSetter(overrides?: CallOverrides): Promise<string>;
-
-    feeTo(overrides?: CallOverrides): Promise<string>;
-
     fills(
       arg0: string,
       arg1: BytesLike,
@@ -588,9 +465,9 @@ export interface OtomeeExchange extends BaseContract {
     hashOrder_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -605,18 +482,7 @@ export interface OtomeeExchange extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    refundPercentage(overrides?: CallOverrides): Promise<BigNumber>;
-
     registries(arg0: string, overrides?: CallOverrides): Promise<boolean>;
-
-    setFee(_fee: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    setFeeTo(_feeTo: string, overrides?: CallOverrides): Promise<void>;
-
-    setFeeToSetter(
-      _feeSetter: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     setOrderFill_(
       hash: BytesLike,
@@ -624,8 +490,16 @@ export interface OtomeeExchange extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setrefundPercentage(
-      _refundPercentage: BigNumberish,
+    stateswap_(
+      uints: BigNumberish[],
+      verifierSelectors: [BytesLike, BytesLike],
+      firstExtradata: BytesLike,
+      firstCalldata: BytesLike,
+      secondExtradata: BytesLike,
+      secondCalldata: BytesLike,
+      howToCalls: [BigNumberish, BigNumberish],
+      metadata: BytesLike,
+      signatures: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -639,9 +513,9 @@ export interface OtomeeExchange extends BaseContract {
     validateOrderParameters_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -657,9 +531,9 @@ export interface OtomeeExchange extends BaseContract {
       hash?: BytesLike | null,
       registry?: null,
       maker?: string | null,
-      staticTarget?: null,
-      staticSelector?: null,
-      staticExtradata?: null,
+      verifierTarget?: null,
+      verifierSelector?: null,
+      verifierExtradata?: null,
       maximumFill?: null,
       listingTime?: null,
       expirationTime?: null,
@@ -670,9 +544,9 @@ export interface OtomeeExchange extends BaseContract {
       hash?: BytesLike | null,
       registry?: null,
       maker?: string | null,
-      staticTarget?: null,
-      staticSelector?: null,
-      staticExtradata?: null,
+      verifierTarget?: null,
+      verifierSelector?: null,
+      verifierExtradata?: null,
       maximumFill?: null,
       listingTime?: null,
       expirationTime?: null,
@@ -720,9 +594,9 @@ export interface OtomeeExchange extends BaseContract {
     approveOrder_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -737,25 +611,6 @@ export interface OtomeeExchange extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    excecuteTrade_(
-      uints: BigNumberish[],
-      staticSelectors: [BytesLike, BytesLike],
-      firstExtradata: BytesLike,
-      firstCalldata: BytesLike,
-      secondExtradata: BytesLike,
-      secondCalldata: BytesLike,
-      howToCalls: [BigNumberish, BigNumberish],
-      metadata: BytesLike,
-      signatures: BytesLike,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    fee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    feeSetter(overrides?: CallOverrides): Promise<BigNumber>;
-
-    feeTo(overrides?: CallOverrides): Promise<BigNumber>;
-
     fills(
       arg0: string,
       arg1: BytesLike,
@@ -765,9 +620,9 @@ export interface OtomeeExchange extends BaseContract {
     hashOrder_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -782,24 +637,7 @@ export interface OtomeeExchange extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    refundPercentage(overrides?: CallOverrides): Promise<BigNumber>;
-
     registries(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    setFee(
-      _fee: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setFeeTo(
-      _feeTo: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setFeeToSetter(
-      _feeSetter: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     setOrderFill_(
       hash: BytesLike,
@@ -807,9 +645,17 @@ export interface OtomeeExchange extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setrefundPercentage(
-      _refundPercentage: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    stateswap_(
+      uints: BigNumberish[],
+      verifierSelectors: [BytesLike, BytesLike],
+      firstExtradata: BytesLike,
+      firstCalldata: BytesLike,
+      secondExtradata: BytesLike,
+      secondCalldata: BytesLike,
+      howToCalls: [BigNumberish, BigNumberish],
+      metadata: BytesLike,
+      signatures: BytesLike,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     validateOrderAuthorization_(
@@ -822,9 +668,9 @@ export interface OtomeeExchange extends BaseContract {
     validateOrderParameters_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -844,9 +690,9 @@ export interface OtomeeExchange extends BaseContract {
     approveOrder_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -861,25 +707,6 @@ export interface OtomeeExchange extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    excecuteTrade_(
-      uints: BigNumberish[],
-      staticSelectors: [BytesLike, BytesLike],
-      firstExtradata: BytesLike,
-      firstCalldata: BytesLike,
-      secondExtradata: BytesLike,
-      secondCalldata: BytesLike,
-      howToCalls: [BigNumberish, BigNumberish],
-      metadata: BytesLike,
-      signatures: BytesLike,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    fee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    feeSetter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    feeTo(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     fills(
       arg0: string,
       arg1: BytesLike,
@@ -889,9 +716,9 @@ export interface OtomeeExchange extends BaseContract {
     hashOrder_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,
@@ -906,26 +733,9 @@ export interface OtomeeExchange extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    refundPercentage(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     registries(
       arg0: string,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    setFee(
-      _fee: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setFeeTo(
-      _feeTo: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setFeeToSetter(
-      _feeSetter: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setOrderFill_(
@@ -934,9 +744,17 @@ export interface OtomeeExchange extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setrefundPercentage(
-      _refundPercentage: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    stateswap_(
+      uints: BigNumberish[],
+      verifierSelectors: [BytesLike, BytesLike],
+      firstExtradata: BytesLike,
+      firstCalldata: BytesLike,
+      secondExtradata: BytesLike,
+      secondCalldata: BytesLike,
+      howToCalls: [BigNumberish, BigNumberish],
+      metadata: BytesLike,
+      signatures: BytesLike,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     validateOrderAuthorization_(
@@ -949,9 +767,9 @@ export interface OtomeeExchange extends BaseContract {
     validateOrderParameters_(
       registry: string,
       maker: string,
-      staticTarget: string,
-      staticSelector: BytesLike,
-      staticExtradata: BytesLike,
+      verifierTarget: string,
+      verifierSelector: BytesLike,
+      verifierExtradata: BytesLike,
       maximumFill: BigNumberish,
       listingTime: BigNumberish,
       expirationTime: BigNumberish,

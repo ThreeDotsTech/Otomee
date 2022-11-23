@@ -4,7 +4,10 @@
 
 import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
-import type { OtomeeStatic, OtomeeStaticInterface } from "../OtomeeStatic";
+import type {
+  StateswapVerifier,
+  StateswapVerifierInterface,
+} from "../StateswapVerifier";
 
 const _abi = [
   {
@@ -335,40 +338,6 @@ const _abi = [
     name: "or",
     outputs: [],
     stateMutability: "view",
-    type: "function",
-    constant: true,
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes",
-        name: "extra",
-        type: "bytes",
-      },
-      {
-        internalType: "address[7]",
-        name: "",
-        type: "address[7]",
-      },
-      {
-        internalType: "enum AuthenticatedProxy.HowToCall",
-        name: "",
-        type: "uint8",
-      },
-      {
-        internalType: "uint256[6]",
-        name: "uints",
-        type: "uint256[6]",
-      },
-      {
-        internalType: "bytes",
-        name: "",
-        type: "bytes",
-      },
-    ],
-    name: "receiveETH",
-    outputs: [],
-    stateMutability: "pure",
     type: "function",
     constant: true,
   },
@@ -896,40 +865,6 @@ const _abi = [
         type: "bytes",
       },
     ],
-    name: "transferERC20ExactTo",
-    outputs: [],
-    stateMutability: "pure",
-    type: "function",
-    constant: true,
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes",
-        name: "extra",
-        type: "bytes",
-      },
-      {
-        internalType: "address[7]",
-        name: "addresses",
-        type: "address[7]",
-      },
-      {
-        internalType: "enum AuthenticatedProxy.HowToCall",
-        name: "howToCall",
-        type: "uint8",
-      },
-      {
-        internalType: "uint256[6]",
-        name: "",
-        type: "uint256[6]",
-      },
-      {
-        internalType: "bytes",
-        name: "data",
-        type: "bytes",
-      },
-    ],
     name: "transferERC721Exact",
     outputs: [],
     stateMutability: "pure",
@@ -946,15 +881,15 @@ const _abi = [
   },
 ];
 
-export class OtomeeStatic__factory {
+export class StateswapVerifier__factory {
   static readonly abi = _abi;
-  static createInterface(): OtomeeStaticInterface {
-    return new utils.Interface(_abi) as OtomeeStaticInterface;
+  static createInterface(): StateswapVerifierInterface {
+    return new utils.Interface(_abi) as StateswapVerifierInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): OtomeeStatic {
-    return new Contract(address, _abi, signerOrProvider) as OtomeeStatic;
+  ): StateswapVerifier {
+    return new Contract(address, _abi, signerOrProvider) as StateswapVerifier;
   }
 }

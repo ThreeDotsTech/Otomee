@@ -5,9 +5,9 @@
 import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
 import type {
-  OtomeeAtomicizer,
-  OtomeeAtomicizerInterface,
-} from "../OtomeeAtomicizer";
+  StateswapAtomicizer,
+  StateswapAtomicizerInterface,
+} from "../StateswapAtomicizer";
 
 const _abi = [
   {
@@ -38,15 +38,15 @@ const _abi = [
   },
 ];
 
-export class OtomeeAtomicizer__factory {
+export class StateswapAtomicizer__factory {
   static readonly abi = _abi;
-  static createInterface(): OtomeeAtomicizerInterface {
-    return new utils.Interface(_abi) as OtomeeAtomicizerInterface;
+  static createInterface(): StateswapAtomicizerInterface {
+    return new utils.Interface(_abi) as StateswapAtomicizerInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): OtomeeAtomicizer {
-    return new Contract(address, _abi, signerOrProvider) as OtomeeAtomicizer;
+  ): StateswapAtomicizer {
+    return new Contract(address, _abi, signerOrProvider) as StateswapAtomicizer;
   }
 }

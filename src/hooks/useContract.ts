@@ -9,7 +9,7 @@ import ERC721_ABI from 'abis/erc721.json'
 import ERC1155_ABI from 'abis/erc1155.json'
 import ERC165_ABI from 'abis/erc165.json'
 import WETH_ABI from 'abis/weth.json'
-import REGISTRY_ABI from 'abis/StateswapAtomicizer.json'
+import REGISTRY_ABI from 'abis/StateswapRegistry.json'
 import EXCHANGE_ABI from 'abis/StateswapExchange.json'
 import ATOMIZICER_ABI from 'abis/StateswapAtomicizer.json'
 import VERIFIER_ABI from 'abis/StateswapVerifier.json'
@@ -22,7 +22,7 @@ import {
   STATESWAP_REGISTRY_ADDRESSES,
   STATESWAP_EXCHANGE_ADDRESSES,
   STATESWAP_ATOMIZICER_ADDRESSES,
-  STATESWAP_STATIC_ADDRESSES
+  STATESWAP_VERIFIER_ADDRESSES
 } from '../constants/addresses'
 import { useMemo } from 'react'
 import { getContract } from '../utils'
@@ -92,7 +92,7 @@ export function useOtomeeAtomizicerContract(withSignerIfPossible?: boolean) {
 }
 
 export function useOtomeeStaticContract(withSignerIfPossible?: boolean) {
-  return useContract<StateswapVerifier>(STATESWAP_STATIC_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
+  return useContract<StateswapVerifier>(STATESWAP_VERIFIER_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
 }
 
 

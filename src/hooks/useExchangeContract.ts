@@ -3,7 +3,6 @@ import { defaultAbiCoder, parseEther, randomBytes } from "ethers/lib/utils";
 import { ArrayToNumber } from "utils";
 import { encodeFunctionSignature } from "utils/encoders";
 import { Call, Order, OrderType, OrderWrapper } from "types/orders";
-import { useERC20Contract, useOtomeeAtomizicerContract } from "./useContract";
 import { Erc20, Erc721, StateswapAtomicizer } from "abis/types";
 import { BigNumber } from "ethers";
 

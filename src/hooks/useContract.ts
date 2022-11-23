@@ -79,20 +79,20 @@ export function useENSRegistrarContract(withSignerIfPossible?: boolean) {
   return useContract<EnsRegistrar>(ENS_REGISTRAR_ADDRESSES, ENS_ABI, withSignerIfPossible)
 }
 
-export function useOtomeeRegistryContract(withSignerIfPossible?: boolean) {
+export function useStateswapRegistryContract(withSignerIfPossible?: boolean) {
   return useContract<StateswapRegistry>(STATESWAP_REGISTRY_ADDRESSES, REGISTRY_ABI, withSignerIfPossible)
 }
 
-export function useOtomeeExchangeContract(withSignerIfPossible?: boolean) {
+export function useStateswapExchangeContract(withSignerIfPossible?: boolean) {
   return useContract<StateswapExchange>(STATESWAP_EXCHANGE_ADDRESSES, EXCHANGE_ABI, withSignerIfPossible)
 }
 
-export function useOtomeeAtomizicerContract(withSignerIfPossible?: boolean) {
+export function useStateswapAtomizicerContract(withSignerIfPossible?: boolean) {
   return useContract<StateswapAtomicizer>(STATESWAP_ATOMIZICER_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
 }
 
-export function useOtomeeStaticContract(withSignerIfPossible?: boolean) {
-  return useContract<StateswapVerifier>(STATESWAP_VERIFIER_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
+export function useStateswapVerifierContract(withSignerIfPossible?: boolean) {
+  return useContract<StateswapVerifier>(STATESWAP_VERIFIER_ADDRESSES, VERIFIER_ABI, withSignerIfPossible)
 }
 
 

@@ -12,8 +12,6 @@ export const WETH_ADDRESSES: AddressMap = {
   [SupportedChainId.GOERLI]: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
 }
 
-
-
 export const ENS_REGISTRAR_ADDRESSES: AddressMap = {
   [SupportedChainId.MAINNET]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
   [SupportedChainId.GOERLI]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
@@ -34,7 +32,7 @@ export const STATESWAP_ATOMIZICER_ADDRESSES: AddressMap = {
   [SupportedChainId.GOERLI]: '0xe54Df82cBb61863987B20BAb6642347961B5738d',
 }
 
-export const STATESWAP_STATIC_ADDRESSES: AddressMap = {
+export const STATESWAP_VERIFIER_ADDRESSES: AddressMap = {
   [SupportedChainId.MAINNET]: '0x31c8b26B5eF7E10C001aD35eADc33ea771819978', //UNDEFINED UNTIL DEPLOYED!
   [SupportedChainId.GOERLI]: '0x98c4d5D255A150df28a791E0d8DCCFff07aaE6f2',
 }

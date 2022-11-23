@@ -1,4 +1,4 @@
-import { STATESWAP_ATOMIZICER_ADDRESSES, STATESWAP_REGISTRY_ADDRESSES, STATESWAP_STATIC_ADDRESSES } from "constants/addresses";
+import { STATESWAP_ATOMIZICER_ADDRESSES, STATESWAP_REGISTRY_ADDRESSES, STATESWAP_VERIFIER_ADDRESSES } from "constants/addresses";
 import { defaultAbiCoder, parseEther, randomBytes } from "ethers/lib/utils";
 import { ArrayToNumber } from "utils";
 import { encodeFunctionSignature } from "utils/encoders";
@@ -82,7 +82,7 @@ function createCalldata_ERC20_Transfer_with_Fee(
     const extradataCall = defaultAbiCoder.encode(
         ["address[]", "uint256[]", "bytes4[]", "bytes"],
         [
-            [STATESWAP_STATIC_ADDRESSES[chainId], STATESWAP_STATIC_ADDRESSES[chainId], STATESWAP_STATIC_ADDRESSES[chainId]],
+            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
             [
                 (callExtradata1.length - 2) / 2,
                 (callExtradata2.length - 2) / 2,
@@ -148,7 +148,7 @@ export function create_ERC20_ERC721_OfferWithFees({
     const extradata = defaultAbiCoder.encode(
         ["address[2]", "bytes4[2]", "bytes", "bytes"],
         [
-            [STATESWAP_STATIC_ADDRESSES[chainId], STATESWAP_STATIC_ADDRESSES[chainId]],
+            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
             [selectorCall, selectorCountercall],
             extradataCall,
             extradataCountercall,
@@ -159,7 +159,7 @@ export function create_ERC20_ERC721_OfferWithFees({
     const order: Order = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
-        staticTarget: STATESWAP_STATIC_ADDRESSES[chainId],
+        staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
         staticSelector: selector,
         staticExtradata: extradata,
         maximumFill: 1,
@@ -209,7 +209,7 @@ export function create_ERC20_ERC721_OfferWithFees({
 
 export function create_empty_call(chainId: number): Call {
     const call: Call = {
-        target: STATESWAP_STATIC_ADDRESSES[chainId],
+        target: STATESWAP_VERIFIER_ADDRESSES[chainId],
         howToCall: 0,
         data: encodeFunctionSignature('test()')
     }
@@ -223,7 +223,7 @@ export function create_accept_any_order(maker: string, chainId: number): Order {
     const order: Order = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
-        staticTarget: STATESWAP_STATIC_ADDRESSES[chainId],
+        staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
         staticSelector: selector,
         staticExtradata: '0x',
         maximumFill: 1,
@@ -279,7 +279,7 @@ export function create_ERC721_ERC20_OR_ETH_Offer_Feeless({
     const extradataOption1 = defaultAbiCoder.encode(
         ["address[2]", "bytes4[2]", "bytes", "bytes"],
         [
-            [STATESWAP_STATIC_ADDRESSES[chainId], STATESWAP_STATIC_ADDRESSES[chainId]],
+            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
             [selectorCall, selectorCountercall1],
             extradataCall,
             extradataCountercall1,
@@ -292,7 +292,7 @@ export function create_ERC721_ERC20_OR_ETH_Offer_Feeless({
     const extradataOption2 = defaultAbiCoder.encode(
         ["address[2]", "bytes4[2]", "bytes", "bytes"],
         [
-            [STATESWAP_STATIC_ADDRESSES[chainId], STATESWAP_STATIC_ADDRESSES[chainId]],
+            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
             [selectorCall, selectorCountercall2],
             extradataCall,
             extradataCountercall2,
@@ -301,7 +301,7 @@ export function create_ERC721_ERC20_OR_ETH_Offer_Feeless({
 
     const extradata = defaultAbiCoder.encode(
         ['address[]', 'bytes4[]', 'uint256[]', 'bytes'],
-        [[STATESWAP_STATIC_ADDRESSES[chainId], STATESWAP_STATIC_ADDRESSES[chainId]],
+        [[STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
         [extradataSelector, extradataSelector],
         [(extradataOption1.length - 2) / 2, (extradataOption2.length - 2) / 2],
         extradataOption1 + extradataOption2.slice(2)]
@@ -310,7 +310,7 @@ export function create_ERC721_ERC20_OR_ETH_Offer_Feeless({
     const order: Order = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
-        staticTarget: STATESWAP_STATIC_ADDRESSES[chainId],
+        staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
         staticSelector: selector,
         staticExtradata: extradata,
         maximumFill: 1,
@@ -393,7 +393,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
     const extradataOption1 = defaultAbiCoder.encode(
         ["address[2]", "bytes4[2]", "bytes", "bytes"],
         [
-            [STATESWAP_STATIC_ADDRESSES[chainId], STATESWAP_STATIC_ADDRESSES[chainId]],
+            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
             [selectorCall, selectorCountercall1],
             extradataCall,
             extradataCountercall1,
@@ -406,7 +406,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
     const extradataOption2 = defaultAbiCoder.encode(
         ["address[2]", "bytes4[2]", "bytes", "bytes"],
         [
-            [STATESWAP_STATIC_ADDRESSES[chainId], STATESWAP_STATIC_ADDRESSES[chainId]],
+            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
             [selectorCall, selectorCountercall2],
             extradataCall,
             extradataCountercall2,
@@ -415,7 +415,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
 
     const extradata = defaultAbiCoder.encode(
         ['address[]', 'bytes4[]', 'uint256[]', 'bytes'],
-        [[STATESWAP_STATIC_ADDRESSES[chainId], STATESWAP_STATIC_ADDRESSES[chainId]],
+        [[STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
         [extradataSelector, extradataSelector],
         [(extradataOption1.length - 2) / 2, (extradataOption2.length - 2) / 2],
         extradataOption1 + extradataOption2.slice(2)]
@@ -424,7 +424,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
     const order: Order = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
-        staticTarget: STATESWAP_STATIC_ADDRESSES[chainId],
+        staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
         staticSelector: selector,
         staticExtradata: extradata,
         maximumFill: 1,

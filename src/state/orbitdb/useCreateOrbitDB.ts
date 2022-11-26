@@ -3,7 +3,7 @@ import DocumentStore from "orbit-db-docstore";
 import KeyValueStore from "orbit-db-kvstore";
 import Store from "orbit-db-store";
 import { useEffect, useState, useContext } from "react";
-import { Order } from "types/orders";
+import { OrderInterface } from "orders/orders";
 
 import OrbitContext from "./orbitContext";
 
@@ -24,7 +24,7 @@ function useCreateOrbitDb(address: string, options: IOpenOptions = {}): {
   orbit: OrbitDB | null
   db: DocumentStore<any> | KeyValueStore<any> | null,
   records: any[],
-  addRecord: (record: Order) => void
+  addRecord: (record: OrderInterface) => void
   //getRecordBy_id: (tokenID: number) => Order
   //Lo que regresa cada función
 } {
@@ -79,9 +79,11 @@ function useCreateOrbitDb(address: string, options: IOpenOptions = {}): {
 
     console.log("Creating database: " + address);
 
-     orbit.create('orderbook','docstore',{accessController: {
+    orbit.create('orderbook', 'docstore', {
+      accessController: {
         write: ["*"],
-      }}).then((newDb: Store) => {
+      }
+    }).then((newDb: Store) => {
       function refreshDb() {
         console.log('Refreshing:')
         newDb && newDb.load().then(() => {

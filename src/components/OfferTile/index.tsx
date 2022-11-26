@@ -10,7 +10,7 @@ import Identicon from 'components/Identicon'
 import { utils } from 'ethers'
 import { useWeb3React } from '@web3-react/core'
 import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
-import { OrderWrapper } from 'types/orders'
+import { OrderWrapperInterface } from 'orders/orders'
 import { useMakeOfferModalToggle } from 'state/application/hooks'
 import { SaleAction } from 'state/sale/reducer'
 
@@ -22,7 +22,7 @@ object-fit: cover;
 overflow: clip;
 `
 
-const OfferTile = ({ order, owner }: { order: OrderWrapper, owner?: string }) => {
+const OfferTile = ({ order, owner }: { order: OrderWrapperInterface, owner?: string }) => {
     const { account } = useWeb3React()
     const isOwner = account?.toLowerCase() == owner?.toLowerCase()
     const ENSNameMaker = useENSName(order.maker)

@@ -1,7 +1,7 @@
 import { Signature } from "ethers";
 import { BytesLike } from "ethers/lib/utils";
 
-export interface Order {
+export interface OrderInterface {
     expirationTime: number
     listingTime: number
     maker: string
@@ -24,19 +24,19 @@ export enum OrderType {
     ERC1155_FOR_ETH_OR_WETH
 }
 
-export interface OrderWrapper {
-    call: Call | undefined
+export interface OrderWrapperInterface {
+    call: CallInterface | undefined
     collection: string
     hash: string | undefined
     maker: string
-    order: Order
+    order: OrderInterface
     price: string
     signature: Signature | undefined
     target: string
     type: OrderType
 }
 
-export interface Call {
+export interface CallInterface {
     data: BytesLike
     howToCall: number
     target: string

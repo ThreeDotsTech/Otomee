@@ -1,5 +1,5 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { OrderWrapper } from "types/orders";
+import { OrderWrapperInterface } from "orders/orders";
 import { updateAction, updateOrder } from "./actions";
 
 export enum SaleAction {
@@ -9,7 +9,7 @@ export enum SaleAction {
 }
 export interface SaleState {
     action: SaleAction | null
-    order: OrderWrapper | null
+    order: OrderWrapperInterface | null
 }
 
 export const initialState: SaleState = {

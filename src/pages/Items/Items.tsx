@@ -23,7 +23,7 @@ import { useMakeOfferModalToggle } from 'state/application/hooks';
 import { SupportedNFTInterfaces } from 'constants/ERC165'
 import { NFTDetailTabs } from 'components/NftDetailTabs';
 import { ItemStatus } from 'components/ItemStatus';
-import { OrderType, OrderWrapper } from 'types/orders';
+import { OrderType, OrderWrapperInterface } from 'orders/orders';
 import OrbitContext from 'state/orbitdb/orbitContext'
 import { BigNumber } from 'ethers';
 import { Send } from 'react-feather'
@@ -46,8 +46,8 @@ const ItemsPage = () => {
     const { is721, is1155, owner, totalSupply, transfers, fetching, erc721Error, erc1155Error, executeQuery } = useGetExactTokenInfo(address, idString, 0)
     const { image, title, description, collectionName, loading, attributesList, animation } = useNFTMetadata(address, idString)
     const { orbitdb } = useContext(OrbitContext)
-    const [buyOrders, setBuyOrders] = useState<OrderWrapper[]>([])
-    const [sellOrders, setSellOrders] = useState<OrderWrapper[]>([])
+    const [buyOrders, setBuyOrders] = useState<OrderWrapperInterface[]>([])
+    const [sellOrders, setSellOrders] = useState<OrderWrapperInterface[]>([])
 
     const [_, setAction] = useSaleActionManager()
     const [__, setOrder] = useSaleOrderManager()
@@ -57,23 +57,23 @@ const ItemsPage = () => {
     //Get buy offers for this NFT, sort by price.
     useEffect(() => {
         if (!orbitdb?.db) return
-        const buyOrders = orbitdb.queryRecord((order: OrderWrapper) => (order.collection.toLowerCase() == address.toLowerCase() && order.target == idString && order.order.expirationTime > Date.now() && (order.type == OrderType.ERC20_FOR_ERC721 || order.type == OrderType.ERC20_FOR_ERC1155)))
-        buyOrders.sort((a: OrderWrapper, b: OrderWrapper) => (BigNumber.from(a.price).lt(BigNumber.from(b.price))) ? 1 : -1)
+        const buyOrders = orbitdb.queryRecord((order: OrderWrapperInterface) => (order.collection.toLowerCase() == address.toLowerCase() && order.target == idString && order.order.expirationTime > Date.now() && (order.type == OrderType.ERC20_FOR_ERC721 || order.type == OrderType.ERC20_FOR_ERC1155)))
+        buyOrders.sort((a: OrderWrapperInterface, b: OrderWrapperInterface) => (BigNumber.from(a.price).lt(BigNumber.from(b.price))) ? 1 : -1)
         setBuyOrders(buyOrders)
     }, [orbitdb])
 
     //Get sell offers for this NFT, sort by price.
     useEffect(() => {
         if (!orbitdb?.db) return
-        const sellOrders = orbitdb.queryRecord((order: OrderWrapper) => true)
+        const sellOrders = orbitdb.queryRecord((order: OrderWrapperInterface) => true)
         console.log(sellOrders)
     }, [orbitdb])
 
     //Get sell offers for this NFT, sort by price.
     useEffect(() => {
         if (!orbitdb?.db) return
-        const sellOrders = orbitdb.queryRecord((order: OrderWrapper) => (order.collection == address && order.target == idString && order.order.expirationTime > Date.now() && (order.type == OrderType.ERC721_FOR_ETH_OR_WETH || order.type == OrderType.ERC1155_FOR_ETH_OR_WETH)))
-        sellOrders.sort((a: OrderWrapper, b: OrderWrapper) => (BigNumber.from(a.price).lt(BigNumber.from(b.price))) ? -1 : 1)
+        const sellOrders = orbitdb.queryRecord((order: OrderWrapperInterface) => (order.collection == address && order.target == idString && order.order.expirationTime > Date.now() && (order.type == OrderType.ERC721_FOR_ETH_OR_WETH || order.type == OrderType.ERC1155_FOR_ETH_OR_WETH)))
+        sellOrders.sort((a: OrderWrapperInterface, b: OrderWrapperInterface) => (BigNumber.from(a.price).lt(BigNumber.from(b.price))) ? -1 : 1)
         setSellOrders(sellOrders)
     }, [orbitdb])
 

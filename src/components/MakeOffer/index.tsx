@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
 import { start } from 'repl';
 import styled from 'styled-components';
-import { OrderWrapper } from 'types/orders';
+import { OrderWrapperInterface } from 'orders/orders';
 import { isToday } from 'utils'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper';
 import { ReactComponent as Close } from '../../assets/images/x.svg'
@@ -59,7 +59,7 @@ export default function MakeOffer({
     animationURL: string
     toggleWalletModal: () => void
     setWalletView: React.Dispatch<React.SetStateAction<string>>
-    setWrappedOrder: React.Dispatch<React.SetStateAction<OrderWrapper | undefined>>
+    setWrappedOrder: React.Dispatch<React.SetStateAction<OrderWrapperInterface | undefined>>
 }) {
 
     const [startDate, setStartDate] = useState<Date>(new Date());

@@ -1,6 +1,6 @@
 import { OrderInterface } from "./orders"
 
-class OrderBuilder implements OrderInterface {
+export class Order implements OrderInterface {
 
     expirationTime: number
     listingTime: number

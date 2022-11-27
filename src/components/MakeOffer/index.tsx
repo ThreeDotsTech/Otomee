@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
 import { start } from 'repl';
 import styled from 'styled-components';
-import { OrderWrapperInterface } from 'orders/orders';
+import { OrderWrapperInterface } from 'orders/types';
 import { isToday } from 'utils'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper';
 import { ReactComponent as Close } from '../../assets/images/x.svg'

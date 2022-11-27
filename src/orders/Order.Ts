@@ -1,4 +1,4 @@
-import { OrderInterface } from "./orders"
+import { OrderInterface } from "./types"
 
 export class Order implements OrderInterface {
 

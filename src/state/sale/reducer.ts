@@ -1,5 +1,5 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { OrderWrapperInterface } from "orders/orders";
+import { OrderWrapperInterface } from "orders/types";
 import { updateAction, updateOrder } from "./actions";
 
 export enum SaleAction {

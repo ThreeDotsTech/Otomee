@@ -1,5 +1,5 @@
 import { Signature } from "ethers";
-import { CallInterface, OrderInterface, OrderType, OrderWrapperInterface } from "./orders";
+import { CallInterface, OrderInterface, OrderType, OrderWrapperInterface } from "./types";
 
 export class OrderWrapper implements OrderWrapperInterface {
 

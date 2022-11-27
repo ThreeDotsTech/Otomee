@@ -23,7 +23,7 @@ import { useMakeOfferModalToggle } from 'state/application/hooks';
 import { SupportedNFTInterfaces } from 'constants/ERC165'
 import { NFTDetailTabs } from 'components/NftDetailTabs';
 import { ItemStatus } from 'components/ItemStatus';
-import { OrderType, OrderWrapperInterface } from 'orders/orders';
+import { OrderType, OrderWrapperInterface } from 'orders/types';
 import OrbitContext from 'state/orbitdb/orbitContext'
 import { BigNumber } from 'ethers';
 import { Send } from 'react-feather'

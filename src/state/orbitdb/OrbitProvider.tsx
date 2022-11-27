@@ -6,7 +6,7 @@ import useOrbit from "./useOrbit";
 import OrbitContext from "./orbitContext";
 import OrbitDB from "orbit-db";
 import { IPFS } from "ipfs"
-import { OrderWrapperInterface } from "orders/orders";
+import { OrderWrapperInterface } from "orders/types";
 import { useOrbitDb } from ".";
 import DocumentStore from "orbit-db-docstore";
 import { MAIN_ORBITDB_ADDRESSS } from "constants/orbitAddresses";

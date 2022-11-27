@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers'
 import React, { useContext, useEffect, useState } from 'react'
 import { AddressZero } from '@ethersproject/constants'
 
-import { OrderWrapperInterface } from 'orders/orders'
+import { OrderWrapperInterface } from 'orders/types'
 import OfferTile from 'components/OfferTile'
 import { useWeb3React } from '@web3-react/core'
 

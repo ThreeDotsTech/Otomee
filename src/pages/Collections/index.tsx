@@ -7,7 +7,7 @@ import AppBody from 'pages/AppBody'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import OrbitContext from 'state/orbitdb/orbitContext'
-import { OrderType, OrderWrapperInterface } from 'orders/orders'
+import { OrderType, OrderWrapperInterface } from 'orders/types'
 
 const Collections = () => {
     const { address }: { address: string } = useParams()

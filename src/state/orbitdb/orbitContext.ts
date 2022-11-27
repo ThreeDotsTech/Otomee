@@ -2,7 +2,7 @@ import OrbitDB from "orbit-db";
 import { createContext } from "react";
 import { IPFS } from "ipfs"
 import DocumentStore from "orbit-db-docstore";
-import { OrderWrapperInterface } from "orders/orders";
+import { OrderWrapperInterface } from "orders/types";
 
 const OrbitContext = createContext<{
     orbit: OrbitDB | null,

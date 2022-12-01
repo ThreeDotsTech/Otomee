@@ -2,27 +2,27 @@ import { Signature } from "ethers";
 import { BytesLike } from "ethers/lib/utils";
 
 export interface OrderInterface {
-    expirationTime: number | undefined
-    listingTime: number | undefined
-    maker: string | undefined
-    maximumFill: number | undefined
-    registry: string | undefined
-    salt: string | undefined
-    staticExtradata: string | undefined
-    staticSelector: string | undefined
-    staticTarget: string | undefined
+    expirationTime: number
+    listingTime: number
+    maker: string
+    maximumFill: number
+    registry: string
+    salt: string
+    staticExtradata: string
+    staticSelector: string
+    staticTarget: string
 }
 
 export interface OrderWrapperInterface {
     call: CallInterface | undefined
-    collection: string | undefined
+    collection: string
     hash: string | undefined
-    maker: string | undefined
-    order: OrderInterface | undefined
-    price: string | undefined
+    maker: string
+    order: OrderInterface
+    price: string
     signature: Signature | undefined
-    target: string | undefined
-    type: OrderType | undefined
+    target: string
+    type: OrderType
 }
 
 export enum OrderType {
@@ -33,7 +33,8 @@ export enum OrderType {
     ERC721_FOR_ETH,
     ERC1155_FOR_ETH,
     ERC721_FOR_ETH_OR_WETH,
-    ERC1155_FOR_ETH_OR_WETH
+    ERC1155_FOR_ETH_OR_WETH,
+    UNDEFINED_TYPE
 }
 
 export interface CallInterface {

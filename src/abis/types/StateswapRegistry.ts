@@ -16,7 +16,7 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface OtomeeRegistryInterface extends utils.Interface {
+export interface StateswapRegistryInterface extends utils.Interface {
   functions: {
     "DELAY_PERIOD()": FunctionFragment;
     "contracts(address)": FunctionFragment;
@@ -169,12 +169,12 @@ export type OwnershipTransferredEvent = TypedEvent<
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
 
-export interface OtomeeRegistry extends BaseContract {
+export interface StateswapRegistry extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: OtomeeRegistryInterface;
+  interface: StateswapRegistryInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,

@@ -1,16 +1,16 @@
 export enum SupportedChainId {
   MAINNET = 1,
-  RINKEBY = 4,
+  GOERLI = 5,
 }
 
 export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   SupportedChainId.MAINNET,
-  SupportedChainId.RINKEBY
+  SupportedChainId.GOERLI
 ]
 
 export const L1_CHAIN_IDS = [
   SupportedChainId.MAINNET,
-  SupportedChainId.RINKEBY
+  SupportedChainId.GOERLI
 ] as const
 
 export type SupportedL1ChainId = typeof L1_CHAIN_IDS[number]
@@ -36,17 +36,17 @@ export type ChainInfo = { readonly [chainId: number]: L1ChainInfo } &
 
 export const CHAIN_INFO: ChainInfo = {
   [SupportedChainId.MAINNET]: {
-    docs: 'https://docs.uniswap.org/',
+    docs: 'https://ethereum.org/en/',
     explorer: 'https://etherscan.io/',
-    infoLink: 'https://info.uniswap.org/#/',
+    infoLink: 'https://info.otomee.com/#/',
     label: 'Ethereum',
     nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
   },
-  [SupportedChainId.RINKEBY]: {
-    docs: 'https://docs.uniswap.org/',
-    explorer: 'https://rinkeby.etherscan.io/',
-    infoLink: 'https://info.uniswap.org/#/',
-    label: 'Ethereum (Rinkeby)',
-    nativeCurrency: { name: 'Rinkeby ETH', symbol: 'rinkETH', decimals: 18 },
+  [SupportedChainId.GOERLI]: {
+    docs: 'https://goerli.net/',
+    explorer: 'https://goerli.etherscan.io/',
+    infoLink: 'https://info.otomee.com/#/',
+    label: 'Ethereum (Görli)',
+    nativeCurrency: { name: 'Goerli ETH', symbol: 'gorETH', decimals: 18 },
   }
 }

@@ -25,10 +25,10 @@ import Option from './Option'
 import PendingView from './PendingView'
 import { useActiveWeb3React } from 'hooks/web3'
 import "react-datepicker/dist/react-datepicker.css";
-import { useERC20Contract, useERC721Contract, useOtomeeExchangeContract, useOtomeeRegistryContract } from 'hooks/useContract'
+import { useERC20Contract, useERC721Contract, useStateswapExchangeContract, useStateswapRegistryContract } from 'hooks/useContract'
 import { useSingleCallResult } from 'state/multicall/hooks'
 import MakeOffer from 'components/MakeOffer'
-import { OrderType, OrderWrapper } from 'types/orders'
+import { OrderType, OrderWrapperInterface } from 'orders/types'
 import { Status } from './Status'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper'
 import { splitSignature } from 'ethers/lib/utils'
@@ -190,13 +190,13 @@ export default function MakeOfferModal({
 
     const [pendingError, setPendingError] = useState<boolean>()
 
-    const [wrappedOrder, setWrappedOrder] = useState<OrderWrapper>()
+    const [wrappedOrder, setWrappedOrder] = useState<OrderWrapperInterface>()
 
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
 
     const erc721c = useERC721Contract(contractAddress)
 
-    const exchangec = useOtomeeExchangeContract(true)
+    const exchangec = useStateswapExchangeContract(true)
 
     const exchange = wrap(exchangec)
 
@@ -248,7 +248,7 @@ export default function MakeOfferModal({
         () => [account === null ? undefined : account],
         [account])
 
-    const registryContract = useOtomeeRegistryContract(true)
+    const registryContract = useStateswapRegistryContract(true)
 
     const proxyAddress = useSingleCallResult(registryContract, 'proxies', accountArgument)
 

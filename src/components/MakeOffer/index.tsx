@@ -3,14 +3,14 @@ import { Web3Provider } from '@ethersproject/providers';
 import { WETH_ADDRESSES } from 'constants/addresses';
 import { SupportedNFTInterfaces } from 'constants/ERC165';
 import { parseEther } from 'ethers/lib/utils';
-import { useERC20Contract, useERC721Contract, useOtomeeAtomizicerContract, useOtomeeExchangeContract } from 'hooks/useContract';
+import { useERC20Contract, useERC721Contract, useStateswapAtomizicerContract, useStateswapExchangeContract } from 'hooks/useContract';
 import { useERC165 } from 'hooks/useERC165';
 import { create_ERC20_ERC721_OfferWithFees, create_ERC721_ERC20_OR_ETH_Offer_Feeless } from 'hooks/useExchangeContract';
 import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
 import { start } from 'repl';
 import styled from 'styled-components';
-import { OrderWrapper } from 'types/orders';
+import { OrderWrapperInterface } from 'orders/types';
 import { isToday } from 'utils'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper';
 import { ReactComponent as Close } from '../../assets/images/x.svg'
@@ -59,7 +59,7 @@ export default function MakeOffer({
     animationURL: string
     toggleWalletModal: () => void
     setWalletView: React.Dispatch<React.SetStateAction<string>>
-    setWrappedOrder: React.Dispatch<React.SetStateAction<OrderWrapper | undefined>>
+    setWrappedOrder: React.Dispatch<React.SetStateAction<OrderWrapperInterface | undefined>>
 }) {
 
     const [startDate, setStartDate] = useState<Date>(new Date());
@@ -72,7 +72,7 @@ export default function MakeOffer({
 
     const erc721c = useERC721Contract(contractAddress)
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
-    const atomicizerc = useOtomeeAtomizicerContract(true)
+    const atomicizerc = useStateswapAtomizicerContract(true)
 
     const isOwner = owner.toLowerCase() == account.toLocaleLowerCase()
 

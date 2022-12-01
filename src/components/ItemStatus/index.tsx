@@ -3,10 +3,10 @@ import { formatEther } from 'ethers/lib/utils'
 import React from 'react'
 import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
 import { SaleAction } from 'state/sale/reducer'
-import { OrderWrapper } from 'types/orders'
+import { OrderWrapperInterface } from 'orders/types'
 import { timeDifference } from 'utils/relativeTime'
 
-export const ItemStatus = ({ loading, makeOfferModalToggle, owner, address, identifier, buyOrders, sellOrders }: { loading: boolean, makeOfferModalToggle: () => void, owner: string, address: string, identifier: string, buyOrders: OrderWrapper[], sellOrders: OrderWrapper[] }) => {
+export const ItemStatus = ({ loading, makeOfferModalToggle, owner, address, identifier, buyOrders, sellOrders }: { loading: boolean, makeOfferModalToggle: () => void, owner: string, address: string, identifier: string, buyOrders: OrderWrapperInterface[], sellOrders: OrderWrapperInterface[] }) => {
 
     const { account } = useWeb3React()
     const [_, setAction] = useSaleActionManager()

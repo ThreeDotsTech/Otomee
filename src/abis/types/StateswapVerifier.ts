@@ -15,7 +15,7 @@ import { FunctionFragment, Result } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface OtomeeStaticInterface extends utils.Interface {
+export interface StateswapVerifierInterface extends utils.Interface {
   functions: {
     "and(bytes,address[7],uint8[2],uint256[6],bytes,bytes)": FunctionFragment;
     "any(bytes,address[7],uint8[2],uint256[6],bytes,bytes)": FunctionFragment;
@@ -26,7 +26,6 @@ export interface OtomeeStaticInterface extends utils.Interface {
     "dumbSequenceExact(bytes,address[7],uint8[2],uint256[6],bytes,bytes)": FunctionFragment;
     "name()": FunctionFragment;
     "or(bytes,address[7],uint8[2],uint256[6],bytes,bytes)": FunctionFragment;
-    "receiveETH(bytes,address[7],uint8,uint256[6],bytes)": FunctionFragment;
     "sequenceAnyAfter(bytes,address[7],uint8,uint256[6],bytes)": FunctionFragment;
     "sequenceExact(bytes,address[7],uint8,uint256[6],bytes)": FunctionFragment;
     "split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)": FunctionFragment;
@@ -39,7 +38,6 @@ export interface OtomeeStaticInterface extends utils.Interface {
     "swapOneForOneERC721Decoding(bytes,address[7],uint8[2],uint256[6],bytes,bytes)": FunctionFragment;
     "transferERC1155Exact(bytes,address[7],uint8,uint256[6],bytes)": FunctionFragment;
     "transferERC20Exact(bytes,address[7],uint8,uint256[6],bytes)": FunctionFragment;
-    "transferERC20ExactTo(bytes,address[7],uint8,uint256[6],bytes)": FunctionFragment;
     "transferERC721Exact(bytes,address[7],uint8,uint256[6],bytes)": FunctionFragment;
     "test()": FunctionFragment;
   };
@@ -118,10 +116,6 @@ export interface OtomeeStaticInterface extends utils.Interface {
       BytesLike,
       BytesLike
     ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "receiveETH",
-    values: [BytesLike, string[], BigNumberish, BigNumberish[], BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "sequenceAnyAfter",
@@ -228,10 +222,6 @@ export interface OtomeeStaticInterface extends utils.Interface {
     values: [BytesLike, string[], BigNumberish, BigNumberish[], BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferERC20ExactTo",
-    values: [BytesLike, string[], BigNumberish, BigNumberish[], BytesLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "transferERC721Exact",
     values: [BytesLike, string[], BigNumberish, BigNumberish[], BytesLike]
   ): string;
@@ -249,7 +239,6 @@ export interface OtomeeStaticInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "or", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "receiveETH", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "sequenceAnyAfter",
     data: BytesLike
@@ -293,10 +282,6 @@ export interface OtomeeStaticInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferERC20ExactTo",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "transferERC721Exact",
     data: BytesLike
   ): Result;
@@ -305,12 +290,12 @@ export interface OtomeeStaticInterface extends utils.Interface {
   events: {};
 }
 
-export interface OtomeeStatic extends BaseContract {
+export interface StateswapVerifier extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: OtomeeStaticInterface;
+  interface: StateswapVerifierInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -402,15 +387,6 @@ export interface OtomeeStatic extends BaseContract {
       uints: BigNumberish[],
       data: BytesLike,
       counterdata: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    receiveETH(
-      extra: BytesLike,
-      arg1: string[],
-      arg2: BigNumberish,
-      uints: BigNumberish[],
-      arg4: BytesLike,
       overrides?: CallOverrides
     ): Promise<[void]>;
 
@@ -530,15 +506,6 @@ export interface OtomeeStatic extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[void]>;
 
-    transferERC20ExactTo(
-      extra: BytesLike,
-      addresses: string[],
-      howToCall: BigNumberish,
-      arg3: BigNumberish[],
-      data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
     transferERC721Exact(
       extra: BytesLike,
       addresses: string[],
@@ -621,15 +588,6 @@ export interface OtomeeStatic extends BaseContract {
     uints: BigNumberish[],
     data: BytesLike,
     counterdata: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  receiveETH(
-    extra: BytesLike,
-    arg1: string[],
-    arg2: BigNumberish,
-    uints: BigNumberish[],
-    arg4: BytesLike,
     overrides?: CallOverrides
   ): Promise<void>;
 
@@ -749,15 +707,6 @@ export interface OtomeeStatic extends BaseContract {
     overrides?: CallOverrides
   ): Promise<void>;
 
-  transferERC20ExactTo(
-    extra: BytesLike,
-    addresses: string[],
-    howToCall: BigNumberish,
-    arg3: BigNumberish[],
-    data: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<void>;
-
   transferERC721Exact(
     extra: BytesLike,
     addresses: string[],
@@ -840,15 +789,6 @@ export interface OtomeeStatic extends BaseContract {
       uints: BigNumberish[],
       data: BytesLike,
       counterdata: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    receiveETH(
-      extra: BytesLike,
-      arg1: string[],
-      arg2: BigNumberish,
-      uints: BigNumberish[],
-      arg4: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -960,15 +900,6 @@ export interface OtomeeStatic extends BaseContract {
     ): Promise<void>;
 
     transferERC20Exact(
-      extra: BytesLike,
-      addresses: string[],
-      howToCall: BigNumberish,
-      arg3: BigNumberish[],
-      data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    transferERC20ExactTo(
       extra: BytesLike,
       addresses: string[],
       howToCall: BigNumberish,
@@ -1065,15 +996,6 @@ export interface OtomeeStatic extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    receiveETH(
-      extra: BytesLike,
-      arg1: string[],
-      arg2: BigNumberish,
-      uints: BigNumberish[],
-      arg4: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     sequenceAnyAfter(
       extra: BytesLike,
       addresses: string[],
@@ -1182,15 +1104,6 @@ export interface OtomeeStatic extends BaseContract {
     ): Promise<BigNumber>;
 
     transferERC20Exact(
-      extra: BytesLike,
-      addresses: string[],
-      howToCall: BigNumberish,
-      arg3: BigNumberish[],
-      data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    transferERC20ExactTo(
       extra: BytesLike,
       addresses: string[],
       howToCall: BigNumberish,
@@ -1285,15 +1198,6 @@ export interface OtomeeStatic extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    receiveETH(
-      extra: BytesLike,
-      arg1: string[],
-      arg2: BigNumberish,
-      uints: BigNumberish[],
-      arg4: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     sequenceAnyAfter(
       extra: BytesLike,
       addresses: string[],
@@ -1402,15 +1306,6 @@ export interface OtomeeStatic extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     transferERC20Exact(
-      extra: BytesLike,
-      addresses: string[],
-      howToCall: BigNumberish,
-      arg3: BigNumberish[],
-      data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    transferERC20ExactTo(
       extra: BytesLike,
       addresses: string[],
       howToCall: BigNumberish,

@@ -9,7 +9,7 @@ import { NetworkConnector } from './NetworkConnector'
 
 export const NETWORK_URLS: { [key in SupportedChainId]: string } = {
   [SupportedChainId.MAINNET]: `https://eth-mainnet.gateway.pokt.network/v1/lb/62218a7249a710003b86c7ea`,
-  [SupportedChainId.RINKEBY]: `https://eth-rinkeby.gateway.pokt.network/v1/lb/62218a7249a710003b86c7ea`,
+  [SupportedChainId.GOERLI]: `https://eth-goerli.gateway.pokt.network/v1/lb/62218a7249a710003b86c7ea`,
 }
 
 export const network = new NetworkConnector({

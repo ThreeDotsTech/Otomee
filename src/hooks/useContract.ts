@@ -9,25 +9,25 @@ import ERC721_ABI from 'abis/erc721.json'
 import ERC1155_ABI from 'abis/erc1155.json'
 import ERC165_ABI from 'abis/erc165.json'
 import WETH_ABI from 'abis/weth.json'
-import REGISTRY_ABI from 'abis/otomee-registry.json'
-import EXCHANGE_ABI from 'abis/otomee-exchange.json'
-import ATOMIZICER_ABI from 'abis/otomee-atomicizer.json'
-import STATIC_ABI from 'abis/otomee-static.json'
+import REGISTRY_ABI from 'abis/StateswapRegistry.json'
+import EXCHANGE_ABI from 'abis/StateswapExchange.json'
+import ATOMIZICER_ABI from 'abis/StateswapAtomicizer.json'
+import VERIFIER_ABI from 'abis/StateswapVerifier.json'
 
 import MulticallABI from 'abis/uniswap-Interface-multicall.json'
 import {
   ARGENT_WALLET_DETECTOR_ADDRESS,
   ENS_REGISTRAR_ADDRESSES,
   MULTICALL_ADDRESS,
-  OTOMEE_REGISTRY_ADDRESSES,
-  OTOMEE_EXCHANGE_ADDRESSES,
-  OTOMEE_ATOMIZICER_ADDRESSES,
-  OTOMEE_STATIC_ADDRESSES
+  STATESWAP_REGISTRY_ADDRESSES,
+  STATESWAP_EXCHANGE_ADDRESSES,
+  STATESWAP_ATOMIZICER_ADDRESSES,
+  STATESWAP_VERIFIER_ADDRESSES
 } from '../constants/addresses'
 import { useMemo } from 'react'
 import { getContract } from '../utils'
 
-import { ArgentWalletDetector, EnsPublicResolver, EnsRegistrar, Erc20, Erc721, Erc1155, Weth, UniswapInterfaceMulticall, Erc165, OtomeeRegistry, OtomeeExchange, OtomeeAtomicizer, OtomeeStatic } from '../abis/types'
+import { ArgentWalletDetector, EnsPublicResolver, EnsRegistrar, Erc20, Erc721, Erc1155, Weth, UniswapInterfaceMulticall, Erc165, StateswapRegistry, StateswapExchange, StateswapAtomicizer, StateswapVerifier } from '../abis/types'
 import { useActiveWeb3React } from './web3'
 
 
@@ -79,20 +79,20 @@ export function useENSRegistrarContract(withSignerIfPossible?: boolean) {
   return useContract<EnsRegistrar>(ENS_REGISTRAR_ADDRESSES, ENS_ABI, withSignerIfPossible)
 }
 
-export function useOtomeeRegistryContract(withSignerIfPossible?: boolean) {
-  return useContract<OtomeeRegistry>(OTOMEE_REGISTRY_ADDRESSES, REGISTRY_ABI, withSignerIfPossible)
+export function useStateswapRegistryContract(withSignerIfPossible?: boolean) {
+  return useContract<StateswapRegistry>(STATESWAP_REGISTRY_ADDRESSES, REGISTRY_ABI, withSignerIfPossible)
 }
 
-export function useOtomeeExchangeContract(withSignerIfPossible?: boolean) {
-  return useContract<OtomeeExchange>(OTOMEE_EXCHANGE_ADDRESSES, EXCHANGE_ABI, withSignerIfPossible)
+export function useStateswapExchangeContract(withSignerIfPossible?: boolean) {
+  return useContract<StateswapExchange>(STATESWAP_EXCHANGE_ADDRESSES, EXCHANGE_ABI, withSignerIfPossible)
 }
 
-export function useOtomeeAtomizicerContract(withSignerIfPossible?: boolean) {
-  return useContract<OtomeeAtomicizer>(OTOMEE_ATOMIZICER_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
+export function useStateswapAtomizicerContract(withSignerIfPossible?: boolean) {
+  return useContract<StateswapAtomicizer>(STATESWAP_ATOMIZICER_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
 }
 
-export function useOtomeeStaticContract(withSignerIfPossible?: boolean) {
-  return useContract<OtomeeStatic>(OTOMEE_STATIC_ADDRESSES, ATOMIZICER_ABI, withSignerIfPossible)
+export function useStateswapVerifierContract(withSignerIfPossible?: boolean) {
+  return useContract<StateswapVerifier>(STATESWAP_VERIFIER_ADDRESSES, VERIFIER_ABI, withSignerIfPossible)
 }
 
 

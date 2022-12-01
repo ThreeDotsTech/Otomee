@@ -24,7 +24,7 @@ export const NFTDetailTabs = ({ transfers, orders, listings, owner }: { transfer
 
     useEffect(() => {
         setTransfersElements(transfers.map((transfer: { timestamp: number, from: any, to: any, transaction: any, }, index: number) =>
-            <TransactionTile key={index} timestamp={transfer.timestamp} from={transfer.from?.id ?? AddressZero} to={transfer.to.id} transaction={transfer.transaction} />))
+            <TransactionTile key={index} timestamp={transfer.timestamp} from={transfer.from?.id ?? AddressZero} to={transfer.to?.id} transaction={transfer.transaction} />))
         return function () {
             setTransfersElements([])
         }

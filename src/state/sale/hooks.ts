@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "state/hooks";
-import { OrderWrapperInterface } from "orders/types";
+import { OrderWrapperInterface } from "stateswap/orders/types";
 import { updateAction, updateOrder } from "./actions";
 import { SaleAction } from "./reducer";
 

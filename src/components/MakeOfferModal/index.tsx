@@ -28,7 +28,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useERC20Contract, useERC721Contract, useStateswapExchangeContract, useStateswapRegistryContract } from 'hooks/useContract'
 import { useSingleCallResult } from 'state/multicall/hooks'
 import MakeOffer from 'components/MakeOffer'
-import { OrderType, OrderWrapperInterface } from 'orders/types'
+import { OrderType, OrderWrapperInterface } from 'stateswap/orders/types'
 import { Status } from './Status'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper'
 import { splitSignature } from 'ethers/lib/utils'

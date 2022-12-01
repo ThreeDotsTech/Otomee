@@ -3,7 +3,7 @@ import { StateswapExchange } from "abis/types"
 import { eip712Domain, eip712Order } from "constants/EIP712"
 import { BigNumberish, BytesLike, CallOverrides, Contract, Signature, Signer } from "ethers"
 import { defaultAbiCoder } from "ethers/lib/utils"
-import { CallInterface, OrderInterface } from "orders/types"
+import { CallInterface, OrderInterface } from "stateswap/orders/types"
 import { hashOrder, parseSig, structToSign } from "utils/order"
 
 //Can´t call _signTypedData from regular Signer.

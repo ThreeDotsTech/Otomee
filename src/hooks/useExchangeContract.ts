@@ -2,7 +2,7 @@ import { STATESWAP_ATOMIZICER_ADDRESSES, STATESWAP_REGISTRY_ADDRESSES, STATESWAP
 import { defaultAbiCoder, parseEther, randomBytes } from "ethers/lib/utils";
 import { ArrayToNumber } from "utils";
 import { encodeFunctionSignature } from "utils/encoders";
-import { CallInterface, OrderInterface, OrderType, OrderWrapperInterface } from "orders/types";
+import { CallInterface, OrderInterface, OrderType, OrderWrapperInterface } from "stateswap/orders/types";
 import { Erc20, Erc721, StateswapAtomicizer } from "abis/types";
 import { BigNumber } from "ethers";
 

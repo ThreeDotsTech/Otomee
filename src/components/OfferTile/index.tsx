@@ -10,7 +10,7 @@ import Identicon from 'components/Identicon'
 import { utils } from 'ethers'
 import { useWeb3React } from '@web3-react/core'
 import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
-import { OrderWrapperInterface } from 'orders/types'
+import { OrderWrapperInterface } from 'stateswap/orders/types'
 import { useMakeOfferModalToggle } from 'state/application/hooks'
 import { SaleAction } from 'state/sale/reducer'
 

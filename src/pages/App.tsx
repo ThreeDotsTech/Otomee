@@ -7,7 +7,7 @@ import Home from "./Home";
 import UserProfile from "./UserProfile";
 import NavBar from 'components/NavBar'
 import Collections from './Collections';
-import ItemsPage from './Items/Items';
+import ItemsPage from './Items';
 import Explore from './Explore';
 
 const AppWrapper = styled.div`

@@ -7,7 +7,7 @@ import AppBody from 'pages/AppBody'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import OrbitContext from 'state/orbitdb/orbitContext'
-import { OrderType, OrderWrapper } from 'types/orders'
+import { OrderType, OrderWrapperInterface } from 'orders/types'
 
 const Collections = () => {
     const { address }: { address: string } = useParams()
@@ -17,13 +17,13 @@ const Collections = () => {
     const [Steps, setSteps] = useState(0)
     const { NFTs, fetching, erc721Error, erc1155Error, executeQuery } = useGetNFTsFromContract(address, 30, Steps * 30)
     const { orbitdb } = useContext(OrbitContext)
-    const [orders, setOrders] = useState<OrderWrapper[]>([])
+    const [orders, setOrders] = useState<OrderWrapperInterface[]>([])
 
     //Get orders for this collection and set floor price.
     useEffect(() => {
         if (!orbitdb?.db) return
-        const orders = orbitdb.queryRecord((order: OrderWrapper) => (order.collection == address) && (order.type == OrderType.ERC721_FOR_ETH_OR_WETH))
-        orders.sort((a: OrderWrapper, b: OrderWrapper) => (BigNumber.from(a.price) > BigNumber.from(b.price)) ? 1 : -1)
+        const orders = orbitdb.queryRecord((order: OrderWrapperInterface) => (order.collection == address) && (order.type == OrderType.ERC721_FOR_ETH_OR_WETH))
+        orders.sort((a: OrderWrapperInterface, b: OrderWrapperInterface) => (BigNumber.from(a.price) > BigNumber.from(b.price)) ? 1 : -1)
         setOrders(orders)
 
     }, [orbitdb])

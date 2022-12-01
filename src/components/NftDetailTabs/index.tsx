@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers'
 import React, { useContext, useEffect, useState } from 'react'
 import { AddressZero } from '@ethersproject/constants'
 
-import { OrderWrapper } from 'types/orders'
+import { OrderWrapperInterface } from 'orders/types'
 import OfferTile from 'components/OfferTile'
 import { useWeb3React } from '@web3-react/core'
 
@@ -13,7 +13,7 @@ enum ActiveTabOptions {
     OFFERS = 2,
     PRICE_HISTORY = 3
 }
-export const NFTDetailTabs = ({ transfers, orders, listings, owner }: { transfers: any[], orders: OrderWrapper[], listings: OrderWrapper[], owner: string }) => {
+export const NFTDetailTabs = ({ transfers, orders, listings, owner }: { transfers: any[], orders: OrderWrapperInterface[], listings: OrderWrapperInterface[], owner: string }) => {
     const { account } = useWeb3React()
     const [ActiveTab, setActiveTab] = useState<ActiveTabOptions>(ActiveTabOptions.TRANSFERS)
     const [transfersElements, setTransfersElements] = useState<JSX.Element[]>([])
@@ -24,7 +24,7 @@ export const NFTDetailTabs = ({ transfers, orders, listings, owner }: { transfer
 
     useEffect(() => {
         setTransfersElements(transfers.map((transfer: { timestamp: number, from: any, to: any, transaction: any, }, index: number) =>
-            <TransactionTile key={index} timestamp={transfer.timestamp} from={transfer.from?.id ?? AddressZero} to={transfer.to.id} transaction={transfer.transaction} />))
+            <TransactionTile key={index} timestamp={transfer.timestamp} from={transfer.from?.id ?? AddressZero} to={transfer.to?.id} transaction={transfer.transaction} />))
         return function () {
             setTransfersElements([])
         }

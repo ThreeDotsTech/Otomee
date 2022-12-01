@@ -28,7 +28,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useERC20Contract, useERC721Contract, useStateswapExchangeContract, useStateswapRegistryContract } from 'hooks/useContract'
 import { useSingleCallResult } from 'state/multicall/hooks'
 import MakeOffer from 'components/MakeOffer'
-import { OrderType, OrderWrapper } from 'types/orders'
+import { OrderType, OrderWrapperInterface } from 'orders/types'
 import { Status } from './Status'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper'
 import { splitSignature } from 'ethers/lib/utils'
@@ -190,7 +190,7 @@ export default function MakeOfferModal({
 
     const [pendingError, setPendingError] = useState<boolean>()
 
-    const [wrappedOrder, setWrappedOrder] = useState<OrderWrapper>()
+    const [wrappedOrder, setWrappedOrder] = useState<OrderWrapperInterface>()
 
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
 

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "state/hooks";
-import { OrderWrapper } from "types/orders";
+import { OrderWrapperInterface } from "orders/types";
 import { updateAction, updateOrder } from "./actions";
 import { SaleAction } from "./reducer";
 
@@ -11,7 +11,7 @@ export function useSaleAction(): SaleAction | null {
     return state.action
 }
 
-export function useSaleOrder(): OrderWrapper | null {
+export function useSaleOrder(): OrderWrapperInterface | null {
     const state = useAppSelector((state) => state.sale)
     return state.order
 }
@@ -30,12 +30,12 @@ export function useSaleActionManager(): [SaleAction | null, (newAction: SaleActi
     return [action, setAction]
 }
 
-export function useSaleOrderManager(): [OrderWrapper | null, (newOrder: OrderWrapper | null) => void] {
+export function useSaleOrderManager(): [OrderWrapperInterface | null, (newOrder: OrderWrapperInterface | null) => void] {
     const dispatch = useAppDispatch()
     const order = useSaleOrder()
 
     const setAction = useCallback(
-        (newOrder: OrderWrapper | null) => {
+        (newOrder: OrderWrapperInterface | null) => {
             dispatch(updateOrder({ order: newOrder }))
         },
         [dispatch]

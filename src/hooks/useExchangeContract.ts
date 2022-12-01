@@ -2,7 +2,7 @@ import { STATESWAP_ATOMIZICER_ADDRESSES, STATESWAP_REGISTRY_ADDRESSES, STATESWAP
 import { defaultAbiCoder, parseEther, randomBytes } from "ethers/lib/utils";
 import { ArrayToNumber } from "utils";
 import { encodeFunctionSignature } from "utils/encoders";
-import { Call, Order, OrderType, OrderWrapper } from "types/orders";
+import { CallInterface, OrderInterface, OrderType, OrderWrapperInterface } from "orders/types";
 import { Erc20, Erc721, StateswapAtomicizer } from "abis/types";
 import { BigNumber } from "ethers";
 
@@ -127,7 +127,7 @@ export function create_ERC20_ERC721_OfferWithFees({
     chainId: number,
     erc20c: Erc20 | null,
     atomicizerc: StateswapAtomicizer | null
-}): OrderWrapper {
+}): OrderWrapperInterface {
     const fee1 = ((erc20Amount.mul(protocolFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
     const fee2 = ((erc20Amount.mul(creatorFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
 
@@ -155,7 +155,7 @@ export function create_ERC20_ERC721_OfferWithFees({
     );
 
     //Registry will be retrieved and assigned later.
-    const order: Order = {
+    const order: OrderInterface = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
         staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
@@ -190,7 +190,7 @@ export function create_ERC20_ERC721_OfferWithFees({
         target: STATESWAP_ATOMIZICER_ADDRESSES[chainId]
     };
 
-    const orderWrapper: OrderWrapper = {
+    const orderWrapper: OrderWrapperInterface = {
         call: call,
         collection: erc721Address,
         hash: undefined,
@@ -206,8 +206,8 @@ export function create_ERC20_ERC721_OfferWithFees({
 
 }
 
-export function create_empty_call(chainId: number): Call {
-    const call: Call = {
+export function create_empty_call(chainId: number): CallInterface {
+    const call: CallInterface = {
         target: STATESWAP_VERIFIER_ADDRESSES[chainId],
         howToCall: 0,
         data: encodeFunctionSignature('test()')
@@ -215,11 +215,11 @@ export function create_empty_call(chainId: number): Call {
     return call
 }
 
-export function create_accept_any_order(maker: string, chainId: number): Order {
+export function create_accept_any_order(maker: string, chainId: number): OrderInterface {
     const selector = encodeFunctionSignature(
         'any(bytes,address[7],uint8[2],uint256[6],bytes,bytes)'
     );
-    const order: Order = {
+    const order: OrderInterface = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
         staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
@@ -255,7 +255,7 @@ export function create_ERC721_ERC20_OR_ETH_Offer_Feeless({
     chainId: number,
     erc721c: Erc721 | null,
     atomicizerc: StateswapAtomicizer | null
-}): OrderWrapper {
+}): OrderWrapperInterface {
 
     const extradataSelector = encodeFunctionSignature(
         "split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)"
@@ -306,7 +306,7 @@ export function create_ERC721_ERC20_OR_ETH_Offer_Feeless({
         extradataOption1 + extradataOption2.slice(2)]
     );
 
-    const order: Order = {
+    const order: OrderInterface = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
         staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
@@ -324,7 +324,7 @@ export function create_ERC721_ERC20_OR_ETH_Offer_Feeless({
 
 
 
-    const orderWrapper: OrderWrapper = {
+    const orderWrapper: OrderWrapperInterface = {
         call: undefined,
         collection: erc721Address.toLowerCase(),
         hash: undefined,
@@ -369,7 +369,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
     chainId: number,
     erc721c: Erc721 | null,
     atomicizerc: StateswapAtomicizer | null
-}): OrderWrapper {
+}): OrderWrapperInterface {
     const fee1 = ((price.mul(protocolFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
     const fee2 = ((price.mul(creatorFee).mul(10).div(1000)).add(5)).div(10) //CreatorFee
 
@@ -420,7 +420,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
         extradataOption1 + extradataOption2.slice(2)]
     );
 
-    const order: Order = {
+    const order: OrderInterface = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
         staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
@@ -438,7 +438,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
 
 
 
-    const orderWrapper: OrderWrapper = {
+    const orderWrapper: OrderWrapperInterface = {
         call: undefined,
         collection: erc721Address.toLowerCase(),
         hash: undefined,

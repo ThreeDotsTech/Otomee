@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom'
 import { useNFTMetadata } from 'hooks/useNFTMetadata'
 import { ReactComponent as Play } from 'assets/svg/play.svg'
 import { ReactComponent as Pause } from 'assets/svg/pause.svg'
-import { OrderWrapperInterface } from 'orders/types'
+import { OrderWrapperInterface } from 'stateswap/orders/types'
 import { formatEther } from 'ethers/lib/utils'
 
 const ItemCard1 = ({ index, address, identifier, order }: { index: number, address: string, identifier: string, order?: OrderWrapperInterface }) => {

@@ -3,7 +3,7 @@ import DocumentStore from "orbit-db-docstore";
 import KeyValueStore from "orbit-db-kvstore";
 import Store from "orbit-db-store";
 import { useEffect, useState, useContext } from "react";
-import { OrderInterface } from "orders/types";
+import { OrderInterface } from "stateswap/orders/types";
 
 import OrbitContext from "./orbitContext";
 

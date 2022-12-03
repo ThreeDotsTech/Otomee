@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit'
-import { OrderWrapperInterface } from 'orders/types'
+import { OrderWrapperInterface } from 'stateswap/orders/types'
 import { SaleAction } from './reducer'
 
 export const updateAction = createAction<{ action: SaleAction | null }>('sale/updateAction')

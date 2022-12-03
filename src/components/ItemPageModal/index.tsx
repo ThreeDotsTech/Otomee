@@ -14,7 +14,7 @@ import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg'
 import { injected } from '../../connectors'
 import { SUPPORTED_WALLETS } from '../../constants/wallet'
 import usePrevious from '../../hooks/usePrevious'
-import { useMakeOfferModalToggle, useModalOpen, useWalletModalToggle } from '../../state/application/hooks'
+import { useItemPageModalToggle, useModalOpen, useWalletModalToggle } from '../../state/application/hooks'
 import { ApplicationModal } from '../../state/application/reducer'
 import { ExternalLink, ThemedText } from '../../theme'
 import { isMobile } from '../../utils/userAgent'
@@ -27,8 +27,8 @@ import { useActiveWeb3React } from 'hooks/web3'
 import "react-datepicker/dist/react-datepicker.css";
 import { useERC20Contract, useERC721Contract, useStateswapExchangeContract, useStateswapRegistryContract } from 'hooks/useContract'
 import { useSingleCallResult } from 'state/multicall/hooks'
-import MakeOffer from 'components/MakeOffer'
-import { OrderType, OrderWrapperInterface } from 'orders/types'
+import MakeOffer from 'components/ItemPageModal/MakeOffer'
+import { OrderType, OrderWrapperInterface } from 'stateswap/orders/types'
 import { Status } from './Status'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper'
 import { splitSignature } from 'ethers/lib/utils'
@@ -156,7 +156,7 @@ object-fit: cover;
 overflow: clip;
 `
 
-export default function MakeOfferModal({
+export default function ItemPageModal({
     contractAddress,
     collectionName,
     owner,
@@ -202,7 +202,7 @@ export default function MakeOfferModal({
 
     const walletModalOpen = useModalOpen(ApplicationModal.MAKE_OFFER)
 
-    const toggleWalletModal = useMakeOfferModalToggle()
+    const toggleWalletModal = useItemPageModalToggle()
 
     const previousAccount = usePrevious(account)
 

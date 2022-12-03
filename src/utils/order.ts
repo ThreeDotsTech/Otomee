@@ -1,5 +1,5 @@
 import { eip712Order } from "constants/EIP712";
-import { OrderInterface } from "orders/types";
+import { OrderInterface } from "stateswap/orders/types";
 import { signHash, structHash } from "./eip712";
 
 export const hashOrder = (order: OrderInterface) => {

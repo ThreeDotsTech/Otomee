@@ -1,3 +1,5 @@
+import { randomBytes } from "ethers/lib/utils"
+import { ArrayToNumber } from "utils"
 import { OrderInterface } from "./types"
 
 export class Order implements OrderInterface {
@@ -12,7 +14,17 @@ export class Order implements OrderInterface {
     staticSelector: string
     staticTarget: string
 
-    constructor() { }
+    constructor() {
+        this.expirationTime = -1;
+        this.listingTime = -1;
+        this.maker = "";
+        this.maximumFill = -1;
+        this.registry = '';
+        this.salt = ArrayToNumber(randomBytes(31))._hex;
+        this.staticExtradata = "";
+        this.staticSelector = "";
+        this.staticTarget = "";
+    }
 
     setExpirationTime(expirationTime: number) {
         this.expirationTime = expirationTime;

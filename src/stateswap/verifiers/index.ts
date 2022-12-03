@@ -5,6 +5,9 @@ import { encodeFunctionSignature } from "utils/encoders";
 
 export const Selectors = {
     util: {
+        any: encodeFunctionSignature(
+            'any(bytes,address[7],uint8[2],uint256[6],bytes,bytes)'
+        ),
         receiveETH: encodeFunctionSignature("receiveETH(bytes,address[7],uint8,uint256[6],bytes)"
         ),
         split: encodeFunctionSignature(
@@ -62,6 +65,9 @@ export const Calls = {
 
 export const Extradata = {
     util: {
+        any: function any() {
+            return '0x'
+        },
         split: function split(
             {
                 addressCall,

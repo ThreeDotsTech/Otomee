@@ -179,7 +179,7 @@ export function create_empty_call(chainId: number): CallInterface {
     return call
 }
 
-export function create_accept_any_order(maker: string, chainId: number): OrderInterface {
+export function createOrderAcceptAny(maker: string, chainId: number): OrderInterface {
     const anySelector = Selectors.util.any
     const anyExtradata = Extradata.util.any()
     const order = new Order()

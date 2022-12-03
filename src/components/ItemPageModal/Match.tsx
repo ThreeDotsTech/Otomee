@@ -11,7 +11,7 @@ import { AddressZero, MaxUint256 } from '@ethersproject/constants'
 import { CallState } from '@uniswap/redux-multicall/dist/types'
 import { StateswapRegistry } from 'abis/types/StateswapRegistry'
 import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg'
-import { create_accept_any_order, create_empty_call } from 'hooks/useExchangeContract'
+import { createOrderAcceptAny, create_empty_call } from 'hooks/useExchangeContract'
 import { splitSignature } from 'ethers/lib/utils'
 import { NULL_SIG, ZERO_BYTES32 } from 'constants/misc'
 import { useERC20Contract, useERC721Contract, useStateswapExchangeContract } from 'hooks/useContract'
@@ -380,7 +380,7 @@ export function MatchView(
                                                     return
                                                 } else {
                                                     if (!chainId || !account || !selectedOrder.signature || !erc721c) return
-                                                    const acceptOrder = create_accept_any_order(account, chainId)
+                                                    const acceptOrder = createOrderAcceptAny(account, chainId)
                                                     const emptyCall = create_empty_call(chainId)
                                                     const callData = erc721c.interface.encodeFunctionData("transferFrom", [selectedOrder.maker, account, selectedOrder.target])
 
@@ -453,7 +453,7 @@ export function MatchView(
                                             } else {
                                                 //Ready to accept the order
                                                 if (!chainId || !account || !selectedOrder.signature || !erc721c) return
-                                                const acceptOrder = create_accept_any_order(account, chainId)
+                                                const acceptOrder = createOrderAcceptAny(account, chainId)
                                                 const emptyCall = create_empty_call(chainId)
                                                 const callData = erc721c.interface.encodeFunctionData("transferFrom", [selectedOrder.maker, account, selectedOrder.target])
 

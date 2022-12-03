@@ -43,7 +43,7 @@ import useENSAddress from 'hooks/useENSAddress'
 import useENSAvatar from 'hooks/useENSAvatar'
 import Identicon from 'components/Identicon'
 import { Link } from 'react-router-dom'
-import { create_accept_any_order, create_empty_call } from 'hooks/useExchangeContract'
+import { createOrderAcceptAny, create_empty_call } from 'hooks/useExchangeContract'
 import { NULL_SIG, ZERO_BYTES32 } from 'constants/misc'
 import { MatchView } from './Match'
 

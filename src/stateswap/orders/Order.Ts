@@ -37,7 +37,7 @@ export class Order implements OrderInterface {
     }
 
     setMaker(maker: string) {
-        this.maker = maker;
+        this.maker = maker.toLowerCase();
         return this;
     }
 
@@ -47,7 +47,7 @@ export class Order implements OrderInterface {
     }
 
     setRegistry(registry: string) {
-        this.registry = registry;
+        this.registry = registry.toLowerCase();
         return this;
     }
 
@@ -67,7 +67,7 @@ export class Order implements OrderInterface {
     }
 
     setStaticTarget(staticTarget: string) {
-        this.staticTarget = staticTarget;
+        this.staticTarget = staticTarget.toLowerCase();
         return this;
     }
 }

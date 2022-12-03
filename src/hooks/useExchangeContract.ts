@@ -8,8 +8,7 @@ import { BigNumber } from "ethers";
 import { Calls, Extradata, Selectors } from "stateswap/verifiers";
 import { Order } from "stateswap/orders/Order";
 import { OrderWrapper } from "stateswap/orders/OrderWrapper";
-import { useWeb3React } from "@web3-react/core";
-
+import { MaxUint256 } from '@ethersproject/constants'
 function createCalldata_ERC20_Transfer_with_Fee(
     chainId: number,
     erc20Address: string,
@@ -181,20 +180,17 @@ export function create_empty_call(chainId: number): CallInterface {
 }
 
 export function create_accept_any_order(maker: string, chainId: number): OrderInterface {
-    const selector = encodeFunctionSignature(
-        'any(bytes,address[7],uint8[2],uint256[6],bytes,bytes)'
-    );
-    const order: OrderInterface = {
-        registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
-        maker: maker,
-        staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
-        staticSelector: selector,
-        staticExtradata: '0x',
-        maximumFill: 1,
-        listingTime: 1,
-        expirationTime: Number.MAX_SAFE_INTEGER - 1,
-        salt: ArrayToNumber(randomBytes(31))._hex
-    }
+    const anySelector = Selectors.util.any
+    const anyExtradata = Extradata.util.any()
+    const order = new Order()
+        .setRegistry(STATESWAP_REGISTRY_ADDRESSES[chainId])
+        .setMaker(maker)
+        .setStaticTarget(STATESWAP_VERIFIER_ADDRESSES[chainId])
+        .setStaticSelector(anySelector)
+        .setStaticExtradata(anyExtradata)
+        .setMaximumFill(1)
+        .setListingTime(0)
+        .setExpirationTime(MaxUint256.toNumber() - 1);
     return order
 
 }

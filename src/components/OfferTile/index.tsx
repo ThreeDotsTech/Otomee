@@ -11,7 +11,7 @@ import { utils } from 'ethers'
 import { useWeb3React } from '@web3-react/core'
 import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
 import { OrderWrapperInterface } from 'stateswap/orders/types'
-import { useMakeOfferModalToggle } from 'state/application/hooks'
+import { useItemPageModalToggle } from 'state/application/hooks'
 import { SaleAction } from 'state/sale/reducer'
 
 const AvatarWrapper = styled.div`
@@ -28,7 +28,7 @@ const OfferTile = ({ order, owner }: { order: OrderWrapperInterface, owner?: str
     const ENSNameMaker = useENSName(order.maker)
     const [_, setAction] = useSaleActionManager()
     const [__, setOrder] = useSaleOrderManager()
-    const MakeOfferModalToggle = useMakeOfferModalToggle()
+    const itemPageModalToggle = useItemPageModalToggle()
     return (
         <div className={'flex w-full py-2 items-center overflow-hidden odd:bg-white even:bg-slate-50 justify-evenly h-10'}>
 
@@ -50,7 +50,7 @@ const OfferTile = ({ order, owner }: { order: OrderWrapperInterface, owner?: str
             {isOwner ?
                 <a
                     onClick={() => {
-                        MakeOfferModalToggle()
+                        itemPageModalToggle()
                         setAction(SaleAction.MATCH)
                         setOrder(order)
                     }}

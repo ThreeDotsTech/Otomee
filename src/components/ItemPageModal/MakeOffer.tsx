@@ -5,7 +5,7 @@ import { SupportedNFTInterfaces } from 'constants/ERC165';
 import { parseEther } from 'ethers/lib/utils';
 import { useERC20Contract, useERC721Contract, useStateswapAtomizicerContract, useStateswapExchangeContract } from 'hooks/useContract';
 import { useERC165 } from 'hooks/useERC165';
-import { create_ERC20_ERC721_OfferWithFees, create_ERC721_ERC20_OR_ETH_Offer_Feeless } from 'hooks/useExchangeContract';
+import { create_ERC20_ERC721_OfferWithFees, create_ERC721_WETH_OR_ETH_Offer } from 'hooks/useExchangeContract';
 import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
 import { start } from 'repl';
@@ -70,7 +70,7 @@ export default function MakeOffer({
     const isERC721 = Erc165Response[0].result?.[0]
     const isERC1155 = Erc165Response[1].result?.[0]
 
-    const erc721c = useERC721Contract(contractAddress)
+
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
     const atomicizerc = useStateswapAtomizicerContract(true)
 
@@ -167,17 +167,13 @@ export default function MakeOffer({
             <button onClick={() => {
                 if (!chainId || !endDate) return
                 setWrappedOrder(
-                    isOwner ? create_ERC721_ERC20_OR_ETH_Offer_Feeless({
+                    isOwner ? create_ERC721_WETH_OR_ETH_Offer({
                         maker: account,
                         owner,
                         erc721Address: contractAddress,
                         tokenId: id,
-                        erc20Address: WETH_ADDRESSES[chainId],
                         price: parseEther(price as string),
-                        expirationTime: endDate.getTime(),
-                        chainId: chainId,
-                        erc721c,
-                        atomicizerc
+                        expirationTime: endDate.getTime()
                     }) : create_ERC20_ERC721_OfferWithFees({
                         maker: account,
                         owner,
@@ -196,7 +192,6 @@ export default function MakeOffer({
                     }
                     )
                 )
-
                 setWalletView('status')
             }} disabled={(isNaN(Number(price)) || price == '' || !endDate)} className='bg-gray-400 disabled:bg-none disabled:hover:scale-100 disabled:cursor-not-allowed bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen  rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5'>
                 <div className="flex flex-row justify-center  items-center w-full h-full px-2 py-3 backdrop-saturate-150 backdrop-blur-md rounded-full ">

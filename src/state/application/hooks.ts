@@ -27,7 +27,7 @@ export function useWalletModalToggle(): () => void {
   return useToggleModal(ApplicationModal.WALLET)
 }
 
-export function useMakeOfferModalToggle(): () => void {
+export function useItemPageModalToggle(): () => void {
   return useToggleModal(ApplicationModal.MAKE_OFFER)
 }
 

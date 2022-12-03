@@ -6,7 +6,7 @@ import { SaleAction } from 'state/sale/reducer'
 import { OrderWrapperInterface } from 'stateswap/orders/types'
 import { timeDifference } from 'utils/relativeTime'
 
-export const ItemStatus = ({ loading, makeOfferModalToggle, owner, address, identifier, buyOrders, sellOrders }: { loading: boolean, makeOfferModalToggle: () => void, owner: string, address: string, identifier: string, buyOrders: OrderWrapperInterface[], sellOrders: OrderWrapperInterface[] }) => {
+export const ItemStatus = ({ loading, itemPageModalToggle, owner, address, identifier, buyOrders, sellOrders }: { loading: boolean, itemPageModalToggle: () => void, owner: string, address: string, identifier: string, buyOrders: OrderWrapperInterface[], sellOrders: OrderWrapperInterface[] }) => {
 
     const { account } = useWeb3React()
     const [_, setAction] = useSaleActionManager()
@@ -28,7 +28,7 @@ export const ItemStatus = ({ loading, makeOfferModalToggle, owner, address, iden
 
                     <div className="flex h-full items-center justify-center my-3">
                         <a onClick={() => {
-                            makeOfferModalToggle()
+                            itemPageModalToggle()
                             if (!isOwner) {
                                 setAction(SaleAction.MATCH)
                                 setOrder(sellOrders[0])
@@ -39,7 +39,7 @@ export const ItemStatus = ({ loading, makeOfferModalToggle, owner, address, iden
                             </div>
                         </a>
                         <a onClick={() => {
-                            makeOfferModalToggle()
+                            itemPageModalToggle()
                             if (isOwner) {
                                 setAction(SaleAction.CANCEL)
                                 setOrder(sellOrders[0])
@@ -65,12 +65,12 @@ export const ItemStatus = ({ loading, makeOfferModalToggle, owner, address, iden
                     }
                     <div className="flex h-full items-center justify-center my-3">
                         {account?.toLowerCase() != owner.toLowerCase() ?
-                            <a onClick={makeOfferModalToggle} className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 cursor-pointer'>
+                            <a onClick={itemPageModalToggle} className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 cursor-pointer'>
                                 <div className="flex flex-row justify-center  items-center w-full h-full px-2 py-3 backdrop-saturate-150 rounded-full ">
                                     <p className=" text-white font-semibold text-base">Make offer</p>
                                 </div>
                             </a> :
-                            <a onClick={makeOfferModalToggle} className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 cursor-pointer'>
+                            <a onClick={itemPageModalToggle} className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 cursor-pointer'>
                                 <div className="flex flex-row justify-center  border-2 border-transparent bg-clip-padding bg-zinc-50 backdrop-saturate-150 items-center w-full h-full px-2 py-3 rounded-full">
                                     <p className="bg-clip-text text-transparent bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen font-semibold text-base" >Sell</p>
                                 </div>

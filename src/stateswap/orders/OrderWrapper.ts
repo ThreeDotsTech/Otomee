@@ -15,7 +15,7 @@ export class OrderWrapper implements OrderWrapperInterface {
 
     constructor(order: OrderInterface) {
         this.collection = ""
-        this.maker = order.maker
+        this.maker = order.maker.toLowerCase()
         this.order = order
         this.price = ""
         this.target = ""
@@ -39,7 +39,7 @@ export class OrderWrapper implements OrderWrapperInterface {
 
     setPrice(price: string) {
         this.price = price.toLowerCase();
-        return price;
+        return this;
     }
 
     setSignature(signature: Signature) {

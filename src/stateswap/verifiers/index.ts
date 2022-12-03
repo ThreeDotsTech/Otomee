@@ -29,7 +29,7 @@ export const Selectors = {
     }
 }
 
-export const Calls = {
+export const VerifierCalls = {
     ERC20_Transfer: function ERC20_Transfer(
         erc20Address: string,
         erc20Amount: BigNumber): [selectorCall: string, extradataCall: string] {

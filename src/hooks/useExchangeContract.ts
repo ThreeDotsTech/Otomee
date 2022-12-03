@@ -5,7 +5,7 @@ import { encodeFunctionSignature } from "utils/encoders";
 import { CallInterface, OrderInterface, OrderType, OrderWrapperInterface } from "stateswap/orders/types";
 import { Erc20, Erc721, StateswapAtomicizer } from "abis/types";
 import { BigNumber } from "ethers";
-import { Calls, Extradata, Selectors } from "stateswap/verifiers";
+import { VerifierCalls, Extradata, Selectors } from "stateswap/verifiers";
 import { Order } from "stateswap/orders/Order";
 import { OrderWrapper } from "stateswap/orders/OrderWrapper";
 import { MaxUint256 } from '@ethersproject/constants'
@@ -106,7 +106,7 @@ export function create_ERC20_ERC721_OfferWithFees({
 
     // Countercall should be an ERC721 transfer
 
-    const [selectorCountercall, extradataCountercall] = Calls.ERC721_Transfer(erc721Address, tokenId)
+    const [selectorCountercall, extradataCountercall] = VerifierCalls.ERC721_Transfer(erc721Address, tokenId)
 
     const extradata = defaultAbiCoder.encode(
         ["address[2]", "bytes4[2]", "bytes", "bytes"],
@@ -192,7 +192,6 @@ export function createOrderAcceptAny(maker: string, chainId: number): OrderInter
         .setListingTime(0)
         .setExpirationTime(MaxUint256.toNumber() - 1);
     return order
-
 }
 
 
@@ -219,13 +218,13 @@ export function create_ERC721_WETH_OR_ETH_Offer({
     const splitSelector = Selectors.util.split;
 
     //Call should be an erc721 token transfer.
-    const [ERC721TransferSelector, ERC721TransferExtradata] = Calls.ERC721_Transfer(erc721Address, tokenId)
+    const [ERC721TransferSelector, ERC721TransferExtradata] = VerifierCalls.ERC721_Transfer(erc721Address, tokenId)
 
     //Countercall should one of two (OR):
     const orSelector = Selectors.util.OR;
 
     //a) ERC721 for ETH
-    const [receiveETHSelector, receiveETHExtradata] = Calls.receive_ETH(price);
+    const [receiveETHSelector, receiveETHExtradata] = VerifierCalls.receive_ETH(price);
     const extradataERC721ForETH = Extradata.util.split(
         {
             addressCall: STATESWAP_VERIFIER_ADDRESSES[chainId],
@@ -238,7 +237,7 @@ export function create_ERC721_WETH_OR_ETH_Offer({
     );
 
     //b) ERC721 for ERC20
-    const [receiveERC20Selector, receiveERC20extradata] = Calls.ERC20_Transfer(wethAddress, price)
+    const [receiveERC20Selector, receiveERC20extradata] = VerifierCalls.ERC20_Transfer(wethAddress, price)
     const extradataERC721ForERC20 = Extradata.util.split(
         {
             addressCall: STATESWAP_VERIFIER_ADDRESSES[chainId],
@@ -327,7 +326,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
         "split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)"
     );
 
-    const [selectorCall, extradataCall] = Calls.ERC721_Transfer(erc721Address, tokenId)
+    const [selectorCall, extradataCall] = VerifierCalls.ERC721_Transfer(erc721Address, tokenId)
 
     //Countercall should be:
 
@@ -337,7 +336,7 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
 
     //a) ERC721 for ETH
 
-    const [selectorCountercall1, extradataCountercall1] = Calls.receive_ETH(price.sub(fee1).sub(fee2))
+    const [selectorCountercall1, extradataCountercall1] = VerifierCalls.receive_ETH(price.sub(fee1).sub(fee2))
 
     const extradataOption1 = defaultAbiCoder.encode(
         ["address[2]", "bytes4[2]", "bytes", "bytes"],

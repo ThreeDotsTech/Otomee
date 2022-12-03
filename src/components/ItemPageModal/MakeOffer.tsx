@@ -172,9 +172,10 @@ export default function MakeOffer({
                         owner,
                         erc721Address: contractAddress,
                         tokenId: id,
+                        chainId,
                         price: parseEther(price as string),
                         expirationTime: endDate.getTime()
-                    }) : create_ERC20_ERC721_OfferWithFees({
+                    }).getOrbitDBSafeOrderWrapper() : create_ERC20_ERC721_OfferWithFees({
                         maker: account,
                         owner,
                         erc721Address: contractAddress,

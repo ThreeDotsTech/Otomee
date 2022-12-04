@@ -369,7 +369,7 @@ export function MatchView(
                                 <>
                                     <h4>{(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ? 'Register' : 'Buy'}</h4>
                                     <h5 className='px-2 pt-4'> {(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ?
-                                        'Register your account to start selling on Otomee, this requires a one-time gas fee.' : 'Accept the transaction in your wallet to process your purchase.'} </h5>
+                                        'Register your account to start selling on Otomee, this requires a one-time gas fee.' : waitingForTX ? 'Waiting for blockchain confirmation.' : 'Accept the transaction in your wallet to process your purchase.'} </h5>
                                     {
                                         waitingForTX ?
                                             <Spinner /> :
@@ -423,13 +423,13 @@ export function MatchView(
                             <>
                                 <h4>{(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ? 'Register' : (proxyAllowance?.result == undefined) ? 'Loading...' : (((isOwner ? proxyAllowance?.result[0] == false : (proxyAllowance?.result[0]._hex != MaxUint256._hex))) || (selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH)) ? 'Approve' : 'Buy'}</h4>
                                 <h5 className='px-2 pt-4'> {(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ?
-                                    'Register your account to start selling on Otomee, this requires a one-time gas fee.' : (proxyAllowance?.result == undefined) ? 'Loading...' : (((isOwner ? proxyAllowance?.result[0] == false : (proxyAllowance?.result[0]._hex != MaxUint256._hex))) || (selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH)) ? 'To get set up for auction listings for the first time, you must approve this item for sale, which requires a one-time gas fee.' : 'Accept the transaction in your wallet to process your purchase.'} </h5>
+                                    'Register your account to start selling on Otomee, this requires a one-time gas fee.' : (proxyAllowance?.result == undefined) ? 'Loading...' : (((isOwner ? proxyAllowance?.result[0] == false : (proxyAllowance?.result[0]._hex != MaxUint256._hex))) || (selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH)) ? 'To get set up for auction listings for the first time, you must approve this item for sale, which requires a one-time gas fee.' : waitingForTX ? 'Waiting for blockchain confirmation.' : 'Accept the transaction in your wallet to process your purchase.'} </h5>
                                 {
                                     waitingForTX ?
                                         <Spinner /> :
                                         <button onClick={() => {
                                             if (proxyAddress?.result == undefined) return
-                                            //Check there is a Stateswap proxy for this wallet
+                                            //Check if there is a Stateswap proxy for this wallet
                                             if (proxyAddress?.result[0] == AddressZero) {
                                                 registryContract?.registerProxy().then((tx: ContractTransaction) => {
                                                     tx.wait(1).then(() => setwaitingForTX(false))

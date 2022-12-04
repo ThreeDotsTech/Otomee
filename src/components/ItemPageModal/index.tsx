@@ -14,7 +14,7 @@ import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg'
 import { injected } from '../../connectors'
 import { SUPPORTED_WALLETS } from '../../constants/wallet'
 import usePrevious from '../../hooks/usePrevious'
-import { useMakeOfferModalToggle, useModalOpen, useWalletModalToggle } from '../../state/application/hooks'
+import { useItemPageModalToggle, useModalOpen, useWalletModalToggle } from '../../state/application/hooks'
 import { ApplicationModal } from '../../state/application/reducer'
 import { ExternalLink, ThemedText } from '../../theme'
 import { isMobile } from '../../utils/userAgent'
@@ -27,8 +27,8 @@ import { useActiveWeb3React } from 'hooks/web3'
 import "react-datepicker/dist/react-datepicker.css";
 import { useERC20Contract, useERC721Contract, useStateswapExchangeContract, useStateswapRegistryContract } from 'hooks/useContract'
 import { useSingleCallResult } from 'state/multicall/hooks'
-import MakeOffer from 'components/MakeOffer'
-import { OrderType, OrderWrapperInterface } from 'orders/types'
+import MakeOffer from 'components/ItemPageModal/MakeOffer'
+import { OrderType, OrderWrapperInterface } from 'stateswap/orders/types'
 import { Status } from './Status'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper'
 import { splitSignature } from 'ethers/lib/utils'
@@ -42,9 +42,8 @@ import { isAddress, shortenAddress } from 'utils'
 import useENSAddress from 'hooks/useENSAddress'
 import useENSAvatar from 'hooks/useENSAvatar'
 import Identicon from 'components/Identicon'
-import { Link } from 'react-router-dom'
-import { create_accept_any_order, create_empty_call } from 'hooks/useExchangeContract'
-import { NULL_SIG, ZERO_BYTES32 } from 'constants/misc'
+import { MatchView } from './Match'
+import Confetti from 'components/Confetti'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -138,7 +137,7 @@ const LinkCard = styled(Card)`
   }
 `
 
-const MAKE_OFFER_VIEWS = {
+export const MAKE_OFFER_VIEWS = {
     OPTIONS: 'options',
     OPTIONS_SECONDARY: 'options_secondary',
     OFFER: 'offer',
@@ -156,7 +155,7 @@ object-fit: cover;
 overflow: clip;
 `
 
-export default function MakeOfferModal({
+export default function ItemPageModal({
     contractAddress,
     collectionName,
     owner,
@@ -202,7 +201,7 @@ export default function MakeOfferModal({
 
     const walletModalOpen = useModalOpen(ApplicationModal.MAKE_OFFER)
 
-    const toggleWalletModal = useMakeOfferModalToggle()
+    const toggleWalletModal = useItemPageModalToggle()
 
     const previousAccount = usePrevious(account)
 
@@ -452,368 +451,32 @@ export default function MakeOfferModal({
             )
         }
         if (modalAction == SaleAction.MATCH) {
-            if (!selectedOrder) return
+            if (!selectedOrder || !chainId || !orbitdb || !orbitdb?.db) return
             return (
-                <UpperSection>
-                    <CloseIcon onClick={toggleWalletModal}>
-                        <CloseColor />
-                    </CloseIcon>
-                    <HeaderRow>
-                        <HoverText
-                            onClick={() => {
-                                setWalletView(
-                                    MAKE_OFFER_VIEWS.OFFER
-                                )
-                                setWrappedOrder(undefined)
-                            }}
-                        >
-                            <ArrowLeft />
-                        </HoverText>
-                        <Row justify="center">
-                            <ThemedText.MediumHeader>
-                                Confirm your purchase
-                            </ThemedText.MediumHeader>
-                        </Row>
-                    </HeaderRow>
-                    <div className="flex flex-col divide-y px-4">
-                        <div className='flex justify-start w-full mb-4'>
-                            <div className="flex">
-                                <div className="flex w-5/12 justify-center overflow-x-hidden aspect-square rounded-lg relative bg-slate-200">
-                                    {(imageURL == '' && animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={imageURL} />}
-                                </div>
-                                <div className="flex flex-col items-start w-7/12 justify-center ml-2 px-2">
-                                    <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{collectionName}</p>
-                                    <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{name}</p>
-                                    <div className=" flex flex-col  items-start text-lg font-semibold text-gray-900 mb-0 text-clip grow border-t w-full justify-start">
-                                        <div className="flex ">
-                                            <p className='text-gray-600 mr-2'>Price: </p>
-                                            {utils.formatEther(selectedOrder.price)} {selectedOrder?.type == OrderType.ERC721_FOR_ETH_OR_WETH ? 'ETH' : 'WETH'}
-                                        </div>
-
-                                        <div className="flex flex-col">
-                                            <p className='text-gray-600 text-base mr-2'>Pay with: </p>
-                                            <div className="flex">
-                                                <a className={' px-2 mr-2 cursor-pointer text-black  rounded-xl ' + (ethWETH ? '' : 'bg-slate-500 text-white')} onClick={() => { setethWETH(false) }}>ETH </a>
-                                                <a className={' px-2 mr-2 cursor-pointer  text-black rounded-xl ' + (ethWETH ? 'bg-slate-500 text-white' : '')} onClick={() => { setethWETH(true) }}>WETH </a>
-                                            </div>
-                                        </div>
-
-
-
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                        </div>
-
-
-                        <div className="max-w-xl mx-2 py-4 border-b-2 pb-4 ">
-                            {!ethWETH ? <>
-                                <div className="flex pb-3">
-                                    <div className="flex-1">
-                                    </div>
-
-                                    <div className="flex-1 ">
-                                        {(proxyAddress?.result == undefined) ? 'Loading...' : ((proxyAddress?.result[0] != AddressZero) ?
-                                            <div className="w-7 h-7  bg-TDRed  mx-auto rounded-full text-lg text-white flex items-center p-2">
-                                                <span className="text-white text-center w-full"><Checkmark className=" w-full fill-current white" /></span>
-                                            </div> :
-                                            <div className="w-7 h-7 bg-white border-2 border-TDRed  mx-auto rounded-full text-lg text-white flex items-center">
-                                                <span className="text-gray-900 text-xs text-center w-full">1</span>
-                                            </div>)
-                                        }
-
-                                    </div>
-
-
-                                    <div className="w-1/4 align-center items-center align-middle content-center flex">
-                                        <div className="w-full bg-gray-200 rounded items-center align-middle align-center flex-1">
-                                            <div className={"transition ease-in-out bg-TDRed      text-xs leading-none py-1 text-center text-gray-900 rounded " +
-                                                ((proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] != AddressZero) ? 'w-full' : 'w-0')
-                                            } ></div>
-                                        </div>
-                                    </div>
-
-                                    {(selectedOrder.type == OrderType.ERC721_FOR_ETH_OR_WETH) ? <></> :
-                                        <>
-                                            <div className="flex-1 ">
-                                                {(proxyAllowance?.result == undefined) ? 'Loading...' : (((isOwner ? proxyAllowance?.result[0] == true : (proxyAllowance?.result[0]._hex == MaxUint256._hex))) ?
-                                                    <div className="w-7 h-7  bg-TDBlue mx-auto rounded-full text-lg text-white flex items-center p-2">
-                                                        <span className="text-white text-center w-full"><Checkmark className=" w-full fill-current white" /></span>
-                                                    </div> :
-                                                    <div className={"transition ease-in-out delay-100 w-7 h-7 bg-white border-2  mx-auto rounded-full text-lg text-white flex items-center " +
-                                                        ((proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] != AddressZero) ? 'border-TDBlue' : 'border-gray-200')
-                                                    }>
-                                                        <span className="text-gray-900 text-xs text-center w-full">2</span>
-                                                    </div>)
-                                                }
-                                            </div>
-
-                                            <div className="w-1/4 align-center items-center align-middle content-center flex">
-                                                <div className="w-full bg-gray-200 rounded items-center align-middle align-center flex-1">
-                                                    <div className={"transition ease-in-out bg-TDBlue  text-xs leading-none py-1 text-center text-gray-900 rounded " +
-                                                        ((proxyAllowance?.result == undefined) ? 'Loading...' : ((isOwner ? proxyAllowance?.result[0] == true : (proxyAllowance?.result[0]._hex == MaxUint256._hex))) ? 'w-full' : 'w-0')
-                                                    } ></div>
-                                                </div>
-                                            </div>
-                                        </>
-                                    }
-
-
-                                    <div className="flex-1">
-                                        <div className={"transition ease-in-out delay-100 w-7 h-7 bg-white border-2  mx-auto rounded-full text-lg text-white flex items-center " +
-                                            ((proxyAllowance?.result == undefined) ? 'Loading...' : (((isOwner ? proxyAllowance?.result[0] == true : (proxyAllowance?.result[0]._hex == MaxUint256._hex))) || (selectedOrder.type == OrderType.ERC721_FOR_ETH_OR_WETH)) ? 'border-TDGreen' : 'border-gray-200')
-                                        }>
-                                            {success ?
-                                                <div className="w-7 h-7  bg-TDGreen mx-auto rounded-full text-lg text-white flex items-center p-2">
-                                                    <span className="text-white text-center w-full"><Checkmark className=" w-full fill-current white" /></span>
-                                                </div> :
-                                                <span className="text-gray-900 text-xs text-center w-full">{(selectedOrder.type == OrderType.ERC721_FOR_ETH_OR_WETH) ? 2 : 3}</span>}
-                                        </div>
-                                    </div>
-
-
-
-
-                                    <div className="flex-1">
-                                    </div>
-                                </div>
-
-                                <div className="flex text-xs content-center items-center justify-center text-center">
-                                    {(selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH) ? <></> :
-                                        <div className="flex-1">
-                                        </div>}
-                                    <div className="w-1/3">
-                                        Register
-                                    </div>
-                                    {(selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH) ? <></> :
-                                        <div className="flex-1">
-                                        </div>}
-                                    {(selectedOrder.type == OrderType.ERC721_FOR_ETH_OR_WETH) ? <></> :
-                                        <div className="w-1/3">
-                                            Buy
-                                        </div>}
-
-                                    <div className="w-1/3">
-                                        {(selectedOrder.type == OrderType.ERC721_FOR_ETH_OR_WETH) ? 'Buy' :
-                                            'Sign'}
-                                    </div>
-                                    {(selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH) ? <></> :
-                                        <div className="flex-1">
-                                        </div>}
-                                </div>
-                            </> :
-                                <>
-                                    <div className="flex pb-3">
-                                        <div className="flex-1">
-                                        </div>
-
-                                        <div className="flex-1 ">
-                                            {(proxyAddress?.result == undefined) ? 'Loading...' : ((proxyAddress?.result[0] != AddressZero) ?
-                                                <div className="w-7 h-7  bg-TDRed  mx-auto rounded-full text-lg text-white flex items-center p-2">
-                                                    <span className="text-white text-center w-full"><Checkmark className=" w-full fill-current white" /></span>
-                                                </div> :
-                                                <div className="w-7 h-7 bg-white border-2 border-TDRed  mx-auto rounded-full text-lg text-white flex items-center">
-                                                    <span className="text-gray-900 text-xs text-center w-full">1</span>
-                                                </div>)
-                                            }
-
-                                        </div>
-
-
-                                        <div className="w-1/4 align-center items-center align-middle content-center flex">
-                                            <div className="w-full bg-gray-200 rounded items-center align-middle align-center flex-1">
-                                                <div className={"transition ease-in-out bg-TDRed      text-xs leading-none py-1 text-center text-gray-900 rounded " +
-                                                    ((proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] != AddressZero) ? 'w-full' : 'w-0')
-                                                } ></div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex-1 ">
-                                            {(proxyAllowance?.result == undefined) ? 'Loading...' : (((isOwner ? proxyAllowance?.result[0] == true : (proxyAllowance?.result[0]._hex == MaxUint256._hex))) ?
-                                                <div className="w-7 h-7  bg-TDBlue mx-auto rounded-full text-lg text-white flex items-center p-2">
-                                                    <span className="text-white text-center w-full"><Checkmark className=" w-full fill-current white" /></span>
-                                                </div> :
-                                                <div className={"transition ease-in-out delay-100 w-7 h-7 bg-white border-2  mx-auto rounded-full text-lg text-white flex items-center " +
-                                                    ((proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] != AddressZero) ? 'border-TDBlue' : 'border-gray-200')
-                                                }>
-                                                    <span className="text-gray-900 text-xs text-center w-full">2</span>
-                                                </div>)
-                                            }
-                                        </div>
-
-                                        <div className="w-1/4 align-center items-center align-middle content-center flex">
-                                            <div className="w-full bg-gray-200 rounded items-center align-middle align-center flex-1">
-                                                <div className={"transition ease-in-out bg-TDBlue  text-xs leading-none py-1 text-center text-gray-900 rounded " +
-                                                    ((proxyAllowance?.result == undefined) ? 'Loading...' : ((isOwner ? proxyAllowance?.result[0] == true : (proxyAllowance?.result[0]._hex == MaxUint256._hex))) ? 'w-full' : 'w-0')
-                                                } ></div>
-                                            </div>
-                                        </div>
-
-
-                                        <div className="flex-1">
-                                            <div className={"transition ease-in-out delay-100 w-7 h-7 bg-white border-2  mx-auto rounded-full text-lg text-white flex items-center " +
-                                                ((proxyAllowance?.result == undefined) ? 'Loading...' : ((isOwner ? proxyAllowance?.result[0] == true : (proxyAllowance?.result[0]._hex == MaxUint256._hex))) ? 'border-TDGreen' : 'border-gray-200')
-                                            }>
-                                                {success ?
-                                                    <div className="w-7 h-7  bg-TDGreen mx-auto rounded-full text-lg text-white flex items-center p-2">
-                                                        <span className="text-white text-center w-full"><Checkmark className=" w-full fill-current white" /></span>
-                                                    </div> :
-                                                    <span className="text-gray-900 text-xs text-center w-full">3</span>}
-                                            </div>
-                                        </div>
-
-
-
-
-                                        <div className="flex-1">
-                                        </div>
-                                    </div>
-
-                                    <div className="flex text-xs content-center text-center">
-                                        <div className="w-1/3">
-                                            Register
-                                        </div>
-
-                                        <div className="w-1/3">
-                                            Approve
-                                        </div>
-
-                                        <div className="w-1/3">
-                                            Buy
-                                        </div>
-
-                                    </div>
-                                </>
-                            }
-                        </div>
-
-                        <div className="flex flex-col items-center py-4">
-                            {success ?
-                                <>
-                                    <h4 className='my-4'>Purchase confirmed!</h4>
-                                    <h4 className='mb-4'>🎉{' '} You are the new owner of {name}!{' '} 🎉</h4>
-                                </> :
-                                !ethWETH ?
-                                    <>
-                                        <>
-                                            <h4>{(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ? 'Register' : 'Buy'}</h4>
-                                            <h5 className='px-2 pt-4'> {(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ?
-                                                'Register your account to start selling on Otomee, this requires a one-time gas fee.' : 'Accept the transaction in your wallet to process your purchase.'} </h5>
-                                            {
-                                                waitingForTX ?
-                                                    <Spinner /> :
-                                                    <button onClick={() => {
-                                                        if (proxyAddress?.result == undefined) return
-                                                        if (proxyAddress?.result[0] == AddressZero) {
-                                                            registryContract?.registerProxy().then((tx: ContractTransaction) => {
-                                                                tx.wait(1).then(() => setwaitingForTX(false))
-                                                            }, (reason: any) => {
-                                                                setwaitingForTX(false)
-                                                            })
-                                                            setwaitingForTX(true)
-                                                            return
-                                                        } else {
-                                                            if (!chainId || !account || !selectedOrder.signature || !erc721c) return
-                                                            const acceptOrder = create_accept_any_order(account, chainId)
-                                                            const emptyCall = create_empty_call(chainId)
-                                                            const callData = erc721c.interface.encodeFunctionData("transferFrom", [selectedOrder.maker, account, selectedOrder.target])
-
-                                                            const NFTCall = {
-                                                                data: callData,
-                                                                howToCall: 0,
-                                                                target: selectedOrder.collection
-                                                            };
-
-                                                            console.log(acceptOrder)
-                                                            console.log(emptyCall)
-                                                            console.log(selectedOrder)
-                                                            console.log(NFTCall)
-                                                            exchange?.excecuteTradeWith(selectedOrder.order, selectedOrder.signature, NFTCall, acceptOrder, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
-                                                        }
-                                                    }} className='bg-gray-400 disabled:bg-none disabled:hover:scale-100 disabled:cursor-not-allowed bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen  rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 my-4'>
-                                                        <div className="flex flex-row justify-center  items-center w-full h-full px-2 py-3 backdrop-saturate-150 backdrop-blur-md rounded-full ">
-                                                            <p className=" text-white font-semibold text-base">{(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ? 'Register' : 'Buy'}</p>
-                                                        </div>
-                                                    </button>
-
-                                            }
-                                        </>
-                                    </> :
-                                    <>
-                                        <h4>{(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ? 'Register' : (proxyAllowance?.result == undefined) ? 'Loading...' : (((isOwner ? proxyAllowance?.result[0] == false : (proxyAllowance?.result[0]._hex != MaxUint256._hex))) || (selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH)) ? 'Approve' : 'Buy'}</h4>
-                                        <h5 className='px-2 pt-4'> {(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ?
-                                            'Register your account to start selling on Otomee, this requires a one-time gas fee.' : (proxyAllowance?.result == undefined) ? 'Loading...' : (((isOwner ? proxyAllowance?.result[0] == false : (proxyAllowance?.result[0]._hex != MaxUint256._hex))) || (selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH)) ? 'To get set up for auction listings for the first time, you must approve this item for sale, which requires a one-time gas fee.' : 'Accept the transaction in your wallet to process your purchase.'} </h5>
-                                        {
-                                            waitingForTX ?
-                                                <Spinner /> :
-                                                <button onClick={() => {
-                                                    if (proxyAddress?.result == undefined) return
-                                                    if (proxyAddress?.result[0] == AddressZero) {
-                                                        registryContract?.registerProxy().then((tx: ContractTransaction) => {
-                                                            tx.wait(1).then(() => setwaitingForTX(false))
-                                                        }, (reason: any) => {
-                                                            setwaitingForTX(false)
-                                                        })
-                                                        setwaitingForTX(true)
-                                                        return
-                                                    }
-                                                    if (proxyAllowance?.result == undefined) return
-                                                    if (((isOwner ? proxyAllowance?.result[0] == false : (proxyAllowance?.result[0]._hex != MaxUint256._hex))) || (selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH)) {
-                                                        if (isOwner) {
-                                                            console.log('Approve')
-                                                            console.log(erc721c)
-                                                            erc721c?.setApprovalForAll(proxyAddress?.result[0], true)
-                                                                .then((tx: ContractTransaction) => {
-                                                                    tx.wait(1).then(() => setwaitingForTX(false))
-                                                                }, (reason: any) => {
-                                                                    setwaitingForTX(false)
-                                                                })
-                                                            console.log('Approve')
-                                                        } else {
-                                                            erc20c?.approve(proxyAddress?.result[0], MaxUint256)
-                                                                .then((tx: ContractTransaction) => {
-                                                                    tx.wait(1).then(() => setwaitingForTX(false))
-                                                                }, (reason: any) => {
-                                                                    setwaitingForTX(false)
-                                                                })
-                                                        }
-                                                        setwaitingForTX(true)
-                                                        return
-                                                    } else {
-                                                        if (!chainId || !account || !selectedOrder.signature || !erc721c) return
-                                                        const acceptOrder = create_accept_any_order(account, chainId)
-                                                        const emptyCall = create_empty_call(chainId)
-                                                        const callData = erc721c.interface.encodeFunctionData("transferFrom", [selectedOrder.maker, account, selectedOrder.target])
-
-                                                        const NFTCall = {
-                                                            data: callData,
-                                                            howToCall: 0,
-                                                            target: selectedOrder.collection
-                                                        };
-
-                                                        console.log(acceptOrder)
-                                                        console.log(emptyCall)
-                                                        console.log(selectedOrder)
-                                                        console.log(NFTCall)
-                                                        exchange?.excecuteTradeWith(selectedOrder.order, selectedOrder.signature, NFTCall, acceptOrder, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
-                                                    }
-                                                }} className='bg-gray-400 disabled:bg-none disabled:hover:scale-100 disabled:cursor-not-allowed bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen  rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 my-4'>
-                                                    <div className="flex flex-row justify-center  items-center w-full h-full px-2 py-3 backdrop-saturate-150 backdrop-blur-md rounded-full ">
-                                                        <p className=" text-white font-semibold text-base">{(proxyAddress?.result == undefined) ? 'Loading...' : (proxyAddress?.result[0] == AddressZero) ? 'Register' : (proxyAllowance?.result == undefined) ? 'Loading...' : (((isOwner ? proxyAllowance?.result[0] == false : (proxyAllowance?.result[0]._hex != MaxUint256._hex))) || (selectedOrder.type != OrderType.ERC721_FOR_ETH_OR_WETH)) ? 'Approve' : 'Buy'}</p>
-                                                    </div>
-                                                </button>
-
-                                        }
-                                    </>}
-                        </div>
-                    </div>
-
-                </UpperSection >
-
-
+                <MatchView                                    // G
+                    name={name}
+                    contractAddress={contractAddress}         // o
+                    account={account}
+                    chainId={chainId}                         // d
+                    setwaitingForTX={setwaitingForTX}
+                    registryContract={registryContract}       // F
+                    waitingForTX={waitingForTX}
+                    success={success}                         // o
+                    proxyAllowance={proxyAllowance}
+                    proxyAddress={proxyAddress}               // r
+                    ethWETH={ethWETH}
+                    isOwner={isOwner}                         // g
+                    selectedOrder={selectedOrder}
+                    collectionName={collectionName}           // i
+                    imageURL={imageURL}
+                    animationURL={animationURL}               // v
+                    setethWETH={setethWETH}
+                    toggleWalletModal={toggleWalletModal}     // e
+                    setWalletView={setWalletView}
+                    setWrappedOrder={setWrappedOrder}         // M
+                    setSuccess={setSuccess}
+                    db={orbitdb.db}
+                />                                            // e
             )
         }
         if (modalAction == SaleAction.TRANSFER) {
@@ -977,7 +640,6 @@ export default function MakeOfferModal({
         if (account && walletView === MAKE_OFFER_VIEWS.OFFER) {
             return (
                 <MakeOffer library={library} owner={owner} account={account} chainId={chainId} setWrappedOrder={setWrappedOrder} contractAddress={contractAddress} toggleWalletModal={toggleWalletModal} setWalletView={setWalletView} collectionName={collectionName} name={name} imageURL={imageURL} animationURL={animationURL} id={id} />
-
             )
         }
         if (account && walletView === MAKE_OFFER_VIEWS.STATUS) {
@@ -1276,6 +938,7 @@ export default function MakeOfferModal({
 
     return (
         <Modal isOpen={walletModalOpen} onDismiss={toggleWalletModal} minHeight={false} maxHeight={90}>
+            <Confetti start={success && modalAction == SaleAction.MATCH} />
             <Wrapper>{getModalContent()}</Wrapper>
         </Modal>
     )

@@ -18,12 +18,12 @@ import { ReactComponent as Share } from 'assets/svg/share.svg'
 import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink';
 import { NetworkContextName } from 'constants/misc';
 import { useWeb3React } from '@web3-react/core';
-import MakeOfferModal from 'components/MakeOfferModal';
-import { useMakeOfferModalToggle } from 'state/application/hooks';
+import ItemPageModal from 'components/ItemPageModal';
+import { useItemPageModalToggle } from 'state/application/hooks';
 import { SupportedNFTInterfaces } from 'constants/ERC165'
 import { NFTDetailTabs } from 'components/NftDetailTabs';
 import { ItemStatus } from 'components/ItemStatus';
-import { OrderType, OrderWrapperInterface } from 'orders/types';
+import { OrderType, OrderWrapperInterface } from 'stateswap/orders/types';
 import OrbitContext from 'state/orbitdb/orbitContext'
 import { BigNumber } from 'ethers';
 import { Send } from 'react-feather'
@@ -43,8 +43,8 @@ const ItemsPage = () => {
     const { address, idString }: { address: string, idString: string } = useParams()
     const [attributesElements, setattributesElements] = useState<JSX.Element[]>([])
     const [nftType, setnftType] = useState<SupportedNFTInterfaces>(SupportedNFTInterfaces.ERC721)
-    const { is721, is1155, owner, totalSupply, transfers, fetching, erc721Error, erc1155Error, executeQuery } = useGetExactTokenInfo(address, idString, 0)
-    const { image, title, description, collectionName, loading, attributesList, animation } = useNFTMetadata(address, idString)
+    const { is721, is1155, totalSupply, transfers, fetching, erc721Error, erc1155Error, executeQuery } = useGetExactTokenInfo(address, idString, 0)
+    const { image, title, description, collectionName, loading, attributesList, animation, owner } = useNFTMetadata(address, idString)
     const { orbitdb } = useContext(OrbitContext)
     const [buyOrders, setBuyOrders] = useState<OrderWrapperInterface[]>([])
     const [sellOrders, setSellOrders] = useState<OrderWrapperInterface[]>([])
@@ -88,7 +88,7 @@ const ItemsPage = () => {
         }
     }, [is721, is1155])
 
-    const makeOfferModalToggle = useMakeOfferModalToggle()
+    const itemPageModalToggle = useItemPageModalToggle()
 
     const { ENSName } = useENSName(owner)
 
@@ -142,7 +142,7 @@ const ItemsPage = () => {
                                     <Favorite className='mx-4 hover:scale-95 cursor-pointer' />
                                     <Share className='mx-4 hover:scale-95 cursor-pointer' />
                                     {isOwner && <Send className='mx-4 hover:scale-95 cursor-pointer' onClick={() => {
-                                        makeOfferModalToggle()
+                                        itemPageModalToggle()
                                         if (isOwner) {
                                             setAction(SaleAction.TRANSFER)
                                         }
@@ -198,7 +198,7 @@ const ItemsPage = () => {
 
                         <div className="flex flex-col items-start w-5/12 -ml-10">
 
-                            <ItemStatus loading={loading} makeOfferModalToggle={makeOfferModalToggle} owner={owner} address={address} identifier={idString} buyOrders={buyOrders} sellOrders={sellOrders} />
+                            <ItemStatus loading={loading} itemPageModalToggle={itemPageModalToggle} owner={owner} address={address} identifier={idString} buyOrders={buyOrders} sellOrders={sellOrders} />
                             <NFTDetailTabs transfers={transfers} orders={buyOrders} listings={sellOrders} owner={owner} />
 
 
@@ -207,7 +207,7 @@ const ItemsPage = () => {
                 </div>
             </>
             {(contextNetwork.active || active) && (
-                <MakeOfferModal contractAddress={address} owner={owner} collectionName={collectionName} name={title} imageURL={image} animationURL={animation} id={idString} reloadNFTData={executeQuery} />
+                <ItemPageModal contractAddress={address} owner={owner} collectionName={collectionName} name={title} imageURL={image} animationURL={animation} id={idString} reloadNFTData={executeQuery} />
             )}
         </AppBody>
     )

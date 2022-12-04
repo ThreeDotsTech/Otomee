@@ -9,15 +9,16 @@ export function useERC721Uri(
     contractAddress: string | undefined,
     id: string | undefined,
     enforceOwnership: boolean
-): { uri?: string; loading: boolean } {
+): { uri?: string; loading: boolean; owner?: string } {
     const idArgument = useMemo(() => [id], [id])
     const contract = useERC721Contract(contractAddress)
-    const owner = useSingleCallResult(contract, 'ownerOf', idArgument, NEVER_RELOAD)
+    const owner = useSingleCallResult(contract, 'ownerOf', idArgument)
     const uri = useSingleCallResult(contract, 'tokenURI', idArgument, NEVER_RELOAD)
     return useMemo(
         () => ({
             uri: !enforceOwnership ? uri.result?.[0] : undefined,
             loading: owner.loading || uri.loading,
+            owner: owner.result?.[0]
         }),
         [enforceOwnership, owner.loading, owner.result, uri.loading, uri.result]
     )

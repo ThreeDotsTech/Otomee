@@ -8,9 +8,9 @@ export interface OrderInterface {
     maximumFill: number
     registry: string
     salt: string
-    staticExtradata: string
-    staticSelector: string
-    staticTarget: string
+    verifierExtradata: string
+    verifierSelector: string
+    verifierTarget: string
 }
 
 export interface OrderWrapperInterface {

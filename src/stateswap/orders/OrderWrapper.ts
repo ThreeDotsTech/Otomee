@@ -15,7 +15,7 @@ export class OrderWrapper implements OrderWrapperInterface {
 
     constructor(order: OrderInterface) {
         this.collection = ""
-        this.maker = order.maker
+        this.maker = order.maker.toLowerCase()
         this.order = order
         this.price = ""
         this.target = ""
@@ -39,7 +39,7 @@ export class OrderWrapper implements OrderWrapperInterface {
 
     setPrice(price: string) {
         this.price = price.toLowerCase();
-        return price;
+        return this;
     }
 
     setSignature(signature: Signature) {
@@ -69,9 +69,9 @@ export class OrderWrapper implements OrderWrapperInterface {
             maximumFill: this.order.maximumFill,
             registry: this.order.registry,
             salt: this.order.salt,
-            staticExtradata: this.order.staticExtradata,
-            staticSelector: this.order.staticSelector,
-            staticTarget: this.order.staticTarget
+            verifierExtradata: this.order.verifierExtradata,
+            verifierSelector: this.order.verifierSelector,
+            verifierTarget: this.order.verifierTarget
         }
 
         const orderWrapper: OrderWrapperInterface = {

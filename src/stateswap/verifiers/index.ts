@@ -1,4 +1,5 @@
 
+import { Erc20 } from "abis/types";
 import { Erc721 } from "abis/types/Erc721";
 import { STATESWAP_VERIFIER_ADDRESSES } from "constants/addresses";
 import { BigNumber } from "ethers";
@@ -36,11 +37,21 @@ export const Call = {
     erc721: {
         transferFrom: function transferFrom(from: string, to: string, tokenId: string, erc721Contract: Erc721, erc721cAddress: string): CallInterface {
 
-            const callData = erc721Contract.interface.encodeFunctionData("transferFrom", [from.toLowerCase(), to.toLowerCase(), tokenId.toLowerCase()])
+            const callData = erc721Contract.interface.encodeFunctionData("transferFrom", [from.toLowerCase(), to.toLowerCase(), tokenId.toLowerCase()]);
             return {
                 data: callData,
                 howToCall: 0,
                 target: erc721cAddress.toLowerCase()
+            }
+        }
+    },
+    erc20: {
+        transferFrom: function transferFrom(from: string, to: string, amount: string, erc20Contract: Erc20, erc20cAddress: string): CallInterface {
+            const callData = erc20Contract.interface.encodeFunctionData("transferFrom", [from, to, amount]);
+            return {
+                data: callData,
+                howToCall: 0,
+                target: erc20cAddress.toLowerCase()
             }
         }
     },

@@ -467,22 +467,29 @@ export function MatchView(
                                                 return
                                             } else {
                                                 //Ready to accept the order
-                                                if (!chainId || !account || !selectedOrder.signature || !erc721c) return
+                                                if (!chainId || !account || !selectedOrder.signature || !erc721c || !erc20c) return
                                                 const OrderAcceptAny = createOrderAcceptAny(account, chainId)
-                                                const emptyCall = Call.utils.empty(chainId)
-                                                const callData = erc721c.interface.encodeFunctionData("transferFrom", [selectedOrder.maker, account, selectedOrder.target])
-
-                                                const NFTCall = {
-                                                    data: callData,
-                                                    howToCall: 0,
-                                                    target: selectedOrder.collection
-                                                };
+                                                const erc20TransferCall = Call.erc20.transferFrom(account, selectedOrder.maker, selectedOrder.price, erc20c, WETH_ADDRESSES[chainId])
+                                                const erc721TransferCall = Call.erc721.transferFrom(selectedOrder.maker, account, selectedOrder.target, erc721c, selectedOrder.collection)
 
                                                 console.log(OrderAcceptAny)
-                                                console.log(emptyCall)
+                                                console.log(erc20TransferCall)
                                                 console.log(selectedOrder)
-                                                console.log(NFTCall)
-                                                exchange?.excecuteTradeWith(selectedOrder.order, selectedOrder.signature, NFTCall, OrderAcceptAny, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
+                                                console.log(erc721TransferCall)
+                                                exchange?.excecuteTrade(selectedOrder.order, selectedOrder.signature, erc721TransferCall, OrderAcceptAny, splitSignature(NULL_SIG), erc20TransferCall, ZERO_BYTES32)
+                                                    .then(
+                                                        (tx: ContractTransaction) => {
+                                                            tx.wait(1).then(() => {
+                                                                //delete order from orbitdb
+                                                                db.del(selectedOrder.hash);
+                                                                setSuccess(true);
+                                                                setwaitingForTX(false);
+                                                            })
+                                                        }, (reason: any) => {
+                                                            setwaitingForTX(false)
+                                                        }
+                                                    );
+                                                setwaitingForTX(true);
                                             }
                                         }} className='bg-gray-400 disabled:bg-none disabled:hover:scale-100 disabled:cursor-not-allowed bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen  rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 my-4'>
                                             <div className="flex flex-row justify-center  items-center w-full h-full px-2 py-3 backdrop-saturate-150 backdrop-blur-md rounded-full ">

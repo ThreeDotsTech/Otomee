@@ -27,7 +27,7 @@ export function wrap(inst: StateswapExchange | null) {
     approveOrderHash: (hash: BytesLike) => inst.approveOrderHash_(hash),
     approveOrder: (order: OrderInterface, inclusion: boolean, misc: any) => inst.approveOrder_(order.registry, order.maker, order.verifierTarget, order.verifierSelector, order.verifierExtradata, order.maximumFill, order.listingTime, order.expirationTime, order.salt, inclusion, misc),
     setOrderFill: (order: OrderInterface, fill: BigNumberish) => inst.setOrderFill_(hashOrder(order), fill),
-    excecuteTrade: (order: OrderInterface, sig: Signature, call: CallInterface, counterorder: OrderInterface, countersig: Signature, countercall: CallInterface, metadata: BytesLike) => inst.stateswap_(
+    stateswap: (order: OrderInterface, sig: Signature, call: CallInterface, counterorder: OrderInterface, countersig: Signature, countercall: CallInterface, metadata: BytesLike) => inst.stateswap_(
       [order.registry, order.maker, order.verifierTarget, order.maximumFill, order.listingTime, order.expirationTime, order.salt, call.target,
       counterorder.registry, counterorder.maker, counterorder.verifierTarget, counterorder.maximumFill, counterorder.listingTime, counterorder.expirationTime, counterorder.salt, countercall.target],
       [order.verifierSelector, counterorder.verifierSelector],
@@ -39,7 +39,7 @@ export function wrap(inst: StateswapExchange | null) {
         defaultAbiCoder.encode(['uint8', 'bytes32', 'bytes32'], [countersig.v, countersig.r, countersig.s])
       ])
     ),
-    excecuteTradeWith: (order: OrderInterface, sig: Signature, call: CallInterface, counterorder: OrderInterface, countersig: Signature, countercall: CallInterface, metadata: BytesLike, misc: any) => inst.stateswap_(
+    stateswapWith: (order: OrderInterface, sig: Signature, call: CallInterface, counterorder: OrderInterface, countersig: Signature, countercall: CallInterface, metadata: BytesLike, misc: any) => inst.stateswap_(
       [order.registry, order.maker, order.verifierTarget, order.maximumFill, order.listingTime, order.expirationTime, order.salt, call.target,
       counterorder.registry, counterorder.maker, counterorder.verifierTarget, counterorder.maximumFill, counterorder.listingTime, counterorder.expirationTime, counterorder.salt, countercall.target],
       [order.verifierSelector, counterorder.verifierSelector],

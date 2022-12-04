@@ -396,7 +396,7 @@ export function MatchView(
                                                     console.log(emptyCall)
                                                     console.log(selectedOrder)
                                                     console.log(erc721TransferCall)
-                                                    exchange?.excecuteTradeWith(selectedOrder.order, selectedOrder.signature, erc721TransferCall, orderAcceptAny, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
+                                                    exchange?.stateswapWith(selectedOrder.order, selectedOrder.signature, erc721TransferCall, orderAcceptAny, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
                                                         .then(
                                                             (tx: ContractTransaction) => {
                                                                 tx.wait(1).then(() => {
@@ -476,7 +476,7 @@ export function MatchView(
                                                 console.log(erc20TransferCall)
                                                 console.log(selectedOrder)
                                                 console.log(erc721TransferCall)
-                                                exchange?.excecuteTrade(selectedOrder.order, selectedOrder.signature, erc721TransferCall, OrderAcceptAny, splitSignature(NULL_SIG), erc20TransferCall, ZERO_BYTES32)
+                                                exchange?.stateswap(selectedOrder.order, selectedOrder.signature, erc721TransferCall, OrderAcceptAny, splitSignature(NULL_SIG), erc20TransferCall, ZERO_BYTES32)
                                                     .then(
                                                         (tx: ContractTransaction) => {
                                                             tx.wait(1).then(() => {

@@ -122,9 +122,9 @@ export function create_ERC20_ERC721_OfferWithFees({
     const order: OrderInterface = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
-        staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
-        staticSelector: selector,
-        staticExtradata: extradata,
+        verifierTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
+        verifierSelector: selector,
+        verifierExtradata: extradata,
         maximumFill: 1,
         listingTime: 0,
         expirationTime: expirationTime,
@@ -170,27 +170,18 @@ export function create_ERC20_ERC721_OfferWithFees({
 
 }
 
-export function create_empty_call(chainId: number): CallInterface {
-    const call: CallInterface = {
-        target: STATESWAP_VERIFIER_ADDRESSES[chainId],
-        howToCall: 0,
-        data: encodeFunctionSignature('test()')
-    }
-    return call
-}
-
 export function createOrderAcceptAny(maker: string, chainId: number): OrderInterface {
     const anySelector = Selectors.util.any
     const anyExtradata = Extradata.util.any()
     const order = new Order()
         .setRegistry(STATESWAP_REGISTRY_ADDRESSES[chainId])
         .setMaker(maker)
-        .setStaticTarget(STATESWAP_VERIFIER_ADDRESSES[chainId])
-        .setStaticSelector(anySelector)
-        .setStaticExtradata(anyExtradata)
+        .setVerifierTarget(STATESWAP_VERIFIER_ADDRESSES[chainId])
+        .setVerifierSelector(anySelector)
+        .setVerifierExtradata(anyExtradata)
         .setMaximumFill(1)
         .setListingTime(0)
-        .setExpirationTime(MaxUint256.toNumber() - 1);
+        .setExpirationTime(Number.MAX_SAFE_INTEGER - 1);
     return order
 }
 
@@ -272,9 +263,9 @@ export function create_ERC721_WETH_OR_ETH_Offer({
     const order = new Order()
         .setRegistry(STATESWAP_REGISTRY_ADDRESSES[chainId])
         .setMaker(maker)
-        .setStaticTarget(STATESWAP_VERIFIER_ADDRESSES[chainId])
-        .setStaticSelector(orSelector)
-        .setStaticExtradata(orExtradata)
+        .setVerifierTarget(STATESWAP_VERIFIER_ADDRESSES[chainId])
+        .setVerifierSelector(orSelector)
+        .setVerifierExtradata(orExtradata)
         .setMaximumFill(1)
         .setListingTime(0)
         .setExpirationTime(expirationTime);
@@ -372,9 +363,9 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
     const order: OrderInterface = {
         registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
         maker: maker,
-        staticTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
-        staticSelector: selector,
-        staticExtradata: extradata,
+        verifierTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
+        verifierSelector: selector,
+        verifierExtradata: extradata,
         maximumFill: 1,
         listingTime: 0,
         expirationTime: expirationTime,

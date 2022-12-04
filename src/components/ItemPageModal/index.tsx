@@ -43,6 +43,7 @@ import useENSAddress from 'hooks/useENSAddress'
 import useENSAvatar from 'hooks/useENSAvatar'
 import Identicon from 'components/Identicon'
 import { MatchView } from './Match'
+import Confetti from 'components/Confetti'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -450,7 +451,7 @@ export default function ItemPageModal({
             )
         }
         if (modalAction == SaleAction.MATCH) {
-            if (!selectedOrder || !chainId) return
+            if (!selectedOrder || !chainId || !orbitdb || !orbitdb?.db) return
             return (
                 <MatchView                                    // G
                     name={name}
@@ -473,8 +474,10 @@ export default function ItemPageModal({
                     toggleWalletModal={toggleWalletModal}     // e
                     setWalletView={setWalletView}
                     setWrappedOrder={setWrappedOrder}         // M
-                />
-            )                                                 // e
+                    setSuccess={setSuccess}
+                    db={orbitdb.db}
+                />                                            // e
+            )
         }
         if (modalAction == SaleAction.TRANSFER) {
             return (
@@ -935,6 +938,7 @@ export default function ItemPageModal({
 
     return (
         <Modal isOpen={walletModalOpen} onDismiss={toggleWalletModal} minHeight={false} maxHeight={90}>
+            <Confetti start={success && modalAction == SaleAction.MATCH} />
             <Wrapper>{getModalContent()}</Wrapper>
         </Modal>
     )

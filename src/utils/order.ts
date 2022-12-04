@@ -11,8 +11,8 @@ export const structToSign = (order: OrderInterface, exchange: string, chainId: n
     name: eip712Order.name,
     fields: eip712Order.fields,
     domain: {
-      name: 'Otomee Exchange',
-      version: '3.2',
+      name: 'Stateswap Exchange',
+      version: '1.0',
       chainId: chainId,
       verifyingContract: exchange
     },

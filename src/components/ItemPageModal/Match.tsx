@@ -11,12 +11,13 @@ import { AddressZero, MaxUint256 } from '@ethersproject/constants'
 import { CallState } from '@uniswap/redux-multicall/dist/types'
 import { StateswapRegistry } from 'abis/types/StateswapRegistry'
 import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg'
-import { createOrderAcceptAny, create_empty_call } from 'hooks/useExchangeContract'
+import { createOrderAcceptAny } from 'hooks/useExchangeContract'
 import { splitSignature } from 'ethers/lib/utils'
 import { NULL_SIG, ZERO_BYTES32 } from 'constants/misc'
 import { useERC20Contract, useERC721Contract, useStateswapExchangeContract } from 'hooks/useContract'
 import { wrap } from 'utils/exchangeWrapper'
 import { WETH_ADDRESSES } from 'constants/addresses'
+import { Call } from 'stateswap/verifiers'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -370,7 +371,9 @@ export function MatchView(
                                             <Spinner /> :
                                             <button onClick={() => {
                                                 if (proxyAddress?.result == undefined) return
+                                                //Check if the user is registered on Stateswap
                                                 if (proxyAddress?.result[0] == AddressZero) {
+                                                    //If not, trigger register Tx
                                                     registryContract?.registerProxy().then((tx: ContractTransaction) => {
                                                         tx.wait(1).then(() => setwaitingForTX(false))
                                                     }, (reason: any) => {
@@ -380,21 +383,16 @@ export function MatchView(
                                                     return
                                                 } else {
                                                     if (!chainId || !account || !selectedOrder.signature || !erc721c) return
-                                                    const acceptOrder = createOrderAcceptAny(account, chainId)
-                                                    const emptyCall = create_empty_call(chainId)
-                                                    const callData = erc721c.interface.encodeFunctionData("transferFrom", [selectedOrder.maker, account, selectedOrder.target])
+                                                    //Ready to match ETH for ERC721
+                                                    const orderAcceptAny = createOrderAcceptAny(account, chainId)
+                                                    const emptyCall = Call.utils.empty(chainId)
+                                                    const erc721TransferCall = Call.erc721.transferFrom(selectedOrder.maker, account, selectedOrder.target, erc721c, selectedOrder.collection)
 
-                                                    const NFTCall = {
-                                                        data: callData,
-                                                        howToCall: 0,
-                                                        target: selectedOrder.collection
-                                                    };
-
-                                                    console.log(acceptOrder)
+                                                    console.log(orderAcceptAny)
                                                     console.log(emptyCall)
                                                     console.log(selectedOrder)
-                                                    console.log(NFTCall)
-                                                    exchange?.excecuteTradeWith(selectedOrder.order, selectedOrder.signature, NFTCall, acceptOrder, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
+                                                    console.log(erc721TransferCall)
+                                                    exchange?.excecuteTradeWith(selectedOrder.order, selectedOrder.signature, erc721TransferCall, orderAcceptAny, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
                                                 }
                                             }} className='bg-gray-400 disabled:bg-none disabled:hover:scale-100 disabled:cursor-not-allowed bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen  rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 my-4'>
                                                 <div className="flex flex-row justify-center  items-center w-full h-full px-2 py-3 backdrop-saturate-150 backdrop-blur-md rounded-full ">
@@ -453,8 +451,8 @@ export function MatchView(
                                             } else {
                                                 //Ready to accept the order
                                                 if (!chainId || !account || !selectedOrder.signature || !erc721c) return
-                                                const acceptOrder = createOrderAcceptAny(account, chainId)
-                                                const emptyCall = create_empty_call(chainId)
+                                                const OrderAcceptAny = createOrderAcceptAny(account, chainId)
+                                                const emptyCall = Call.utils.empty(chainId)
                                                 const callData = erc721c.interface.encodeFunctionData("transferFrom", [selectedOrder.maker, account, selectedOrder.target])
 
                                                 const NFTCall = {
@@ -463,11 +461,11 @@ export function MatchView(
                                                     target: selectedOrder.collection
                                                 };
 
-                                                console.log(acceptOrder)
+                                                console.log(OrderAcceptAny)
                                                 console.log(emptyCall)
                                                 console.log(selectedOrder)
                                                 console.log(NFTCall)
-                                                exchange?.excecuteTradeWith(selectedOrder.order, selectedOrder.signature, NFTCall, acceptOrder, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
+                                                exchange?.excecuteTradeWith(selectedOrder.order, selectedOrder.signature, NFTCall, OrderAcceptAny, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
                                             }
                                         }} className='bg-gray-400 disabled:bg-none disabled:hover:scale-100 disabled:cursor-not-allowed bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen  rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 my-4'>
                                             <div className="flex flex-row justify-center  items-center w-full h-full px-2 py-3 backdrop-saturate-150 backdrop-blur-md rounded-full ">

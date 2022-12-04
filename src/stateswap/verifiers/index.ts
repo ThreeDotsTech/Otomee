@@ -1,6 +1,9 @@
 
+import { Erc721 } from "abis/types/Erc721";
+import { STATESWAP_VERIFIER_ADDRESSES } from "constants/addresses";
 import { BigNumber } from "ethers";
 import { defaultAbiCoder } from "ethers/lib/utils";
+import { CallInterface } from "stateswap/orders/types";
 import { encodeFunctionSignature } from "utils/encoders";
 
 export const Selectors = {
@@ -26,6 +29,30 @@ export const Selectors = {
         transferExact: encodeFunctionSignature(
             "transferERC20Exact(bytes,address[7],uint8,uint256[6],bytes)"
         )
+    }
+}
+
+export const Call = {
+    erc721: {
+        transferFrom: function transferFrom(from: string, to: string, tokenId: string, erc721Contract: Erc721, erc721cAddress: string): CallInterface {
+
+            const callData = erc721Contract.interface.encodeFunctionData("transferFrom", [from.toLowerCase(), to.toLowerCase(), tokenId.toLowerCase()])
+            return {
+                data: callData,
+                howToCall: 0,
+                target: erc721cAddress.toLowerCase()
+            }
+        }
+    },
+    utils: {
+        empty: function empty(chainId: number): CallInterface {
+            const call: CallInterface = {
+                target: STATESWAP_VERIFIER_ADDRESSES[chainId].toLowerCase(),
+                howToCall: 0,
+                data: encodeFunctionSignature('test()')
+            }
+            return call
+        }
     }
 }
 

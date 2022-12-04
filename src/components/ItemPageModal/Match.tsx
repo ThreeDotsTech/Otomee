@@ -18,7 +18,7 @@ import { useERC20Contract, useERC721Contract, useStateswapExchangeContract } fro
 import { wrap } from 'utils/exchangeWrapper'
 import { WETH_ADDRESSES } from 'constants/addresses'
 import { Call } from 'stateswap/verifiers'
-
+import DocumentStore from 'orbit-db-docstore'
 const CloseIcon = styled.div`
   position: absolute;
   right: 1rem;
@@ -94,6 +94,8 @@ export function MatchView(
         chainId,
         account,
         contractAddress,
+        db,
+        setSuccess,
         setwaitingForTX,
         setethWETH,
         setWalletView,
@@ -116,10 +118,12 @@ export function MatchView(
         collectionName: string,
         imageURL: string,
         animationURL: string,
+        setSuccess: React.Dispatch<React.SetStateAction<boolean>>,
         setethWETH: React.Dispatch<React.SetStateAction<boolean>>
         toggleWalletModal: () => void,
         setWalletView: React.Dispatch<React.SetStateAction<string>>,
-        setWrappedOrder: React.Dispatch<React.SetStateAction<OrderWrapperInterface | undefined>>
+        setWrappedOrder: React.Dispatch<React.SetStateAction<OrderWrapperInterface | undefined>>,
+        db: DocumentStore<OrderWrapperInterface>
     }
 ) {
     const erc721c = useERC721Contract(contractAddress)
@@ -393,6 +397,19 @@ export function MatchView(
                                                     console.log(selectedOrder)
                                                     console.log(erc721TransferCall)
                                                     exchange?.excecuteTradeWith(selectedOrder.order, selectedOrder.signature, erc721TransferCall, orderAcceptAny, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
+                                                        .then(
+                                                            (tx: ContractTransaction) => {
+                                                                tx.wait(1).then(() => {
+                                                                    //delete order from orbitdb
+                                                                    db.del(selectedOrder.hash);
+                                                                    setSuccess(true);
+                                                                    setwaitingForTX(false);
+                                                                })
+                                                            }, (reason: any) => {
+                                                                setwaitingForTX(false)
+                                                            }
+                                                        );
+                                                    setwaitingForTX(true);
                                                 }
                                             }} className='bg-gray-400 disabled:bg-none disabled:hover:scale-100 disabled:cursor-not-allowed bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen  rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 my-4'>
                                                 <div className="flex flex-row justify-center  items-center w-full h-full px-2 py-3 backdrop-saturate-150 backdrop-blur-md rounded-full ">
@@ -477,7 +494,6 @@ export function MatchView(
                             </>}
                 </div>
             </div>
-
         </UpperSection >
 
 

@@ -23,7 +23,7 @@ export const ItemStatus = ({ loading, itemPageModalToggle, owner, address, ident
                     </div>
                     <div className="flex flex-col h-full items-center justify-center my-5  ">
                         {loading ? <h2 className="bg-gray-600 animate-pulse h-20 mt-3 w-3/5"></h2> : <p className="text-5xl font-semibold text-black mb-0 text-ellipsis pb-2">{formatEther(sellOrders[0].price)} ETH</p>}
-                        {loading ? <h2 className="bg-gray-400 animate-pulse h-5 w-3/12"></h2> : <span className="text-lg font-semibold text-black mb-0 text-ellipsis">($4,514,370.00 USD)</span>}
+                        {loading ? <h2 className="bg-gray-400 animate-pulse h-5 w-3/12"></h2> : <span className="text-lg font-semibold text-black mb-0 text-ellipsis"></span>}
                     </div>
 
                     <div className="flex h-full items-center justify-center my-3">

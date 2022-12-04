@@ -42,9 +42,6 @@ import { isAddress, shortenAddress } from 'utils'
 import useENSAddress from 'hooks/useENSAddress'
 import useENSAvatar from 'hooks/useENSAvatar'
 import Identicon from 'components/Identicon'
-import { Link } from 'react-router-dom'
-import { createOrderAcceptAny, create_empty_call } from 'hooks/useExchangeContract'
-import { NULL_SIG, ZERO_BYTES32 } from 'constants/misc'
 import { MatchView } from './Match'
 
 const CloseIcon = styled.div`

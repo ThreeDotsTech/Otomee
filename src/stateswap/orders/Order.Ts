@@ -10,9 +10,9 @@ export class Order implements OrderInterface {
     maximumFill: number
     registry: string
     salt: string
-    staticExtradata: string
-    staticSelector: string
-    staticTarget: string
+    verifierExtradata: string
+    verifierSelector: string
+    verifierTarget: string
 
     constructor() {
         this.expirationTime = -1;
@@ -21,9 +21,9 @@ export class Order implements OrderInterface {
         this.maximumFill = -1;
         this.registry = '';
         this.salt = ArrayToNumber(randomBytes(31))._hex;
-        this.staticExtradata = "";
-        this.staticSelector = "";
-        this.staticTarget = "";
+        this.verifierExtradata = "";
+        this.verifierSelector = "";
+        this.verifierTarget = "";
     }
 
     setExpirationTime(expirationTime: number) {
@@ -37,7 +37,7 @@ export class Order implements OrderInterface {
     }
 
     setMaker(maker: string) {
-        this.maker = maker;
+        this.maker = maker.toLowerCase();
         return this;
     }
 
@@ -47,7 +47,7 @@ export class Order implements OrderInterface {
     }
 
     setRegistry(registry: string) {
-        this.registry = registry;
+        this.registry = registry.toLowerCase();
         return this;
     }
 
@@ -56,18 +56,18 @@ export class Order implements OrderInterface {
         return this;
     }
 
-    setStaticExtradata(staticExtradata: string) {
-        this.staticExtradata = staticExtradata;
+    setVerifierExtradata(verifierExtradata: string) {
+        this.verifierExtradata = verifierExtradata;
         return this;
     }
 
-    setStaticSelector(staticSelector: string) {
-        this.staticSelector = staticSelector;
+    setVerifierSelector(verifierSelector: string) {
+        this.verifierSelector = verifierSelector;
         return this;
     }
 
-    setStaticTarget(staticTarget: string) {
-        this.staticTarget = staticTarget;
+    setVerifierTarget(verifierTarget: string) {
+        this.verifierTarget = verifierTarget.toLowerCase();
         return this;
     }
 }

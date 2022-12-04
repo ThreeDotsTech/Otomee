@@ -13,7 +13,8 @@ export function useNFTMetadata(address: string, id: string): {
     description: string,
     loading: boolean,
     attributesList?: any,
-    collectionName: string
+    collectionName: string,
+    owner: string
 } {
     const memoid = useMemo(() => id, [id])
 
@@ -155,7 +156,8 @@ export function useNFTMetadata(address: string, id: string): {
         description: description,
         loading: loading || LoadingMemo,
         attributesList: AttributesList ?? null,
-        collectionName: collectionName
+        collectionName: collectionName,
+        owner: erc721.owner || ''
     }
 
 }

@@ -69,9 +69,9 @@ export class OrderWrapper implements OrderWrapperInterface {
             maximumFill: this.order.maximumFill,
             registry: this.order.registry,
             salt: this.order.salt,
-            staticExtradata: this.order.staticExtradata,
-            staticSelector: this.order.staticSelector,
-            staticTarget: this.order.staticTarget
+            verifierExtradata: this.order.verifierExtradata,
+            verifierSelector: this.order.verifierSelector,
+            verifierTarget: this.order.verifierTarget
         }
 
         const orderWrapper: OrderWrapperInterface = {

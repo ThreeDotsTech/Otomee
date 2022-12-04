@@ -1,10 +1,17 @@
 
+import { Erc20 } from "abis/types";
+import { Erc721 } from "abis/types/Erc721";
+import { STATESWAP_VERIFIER_ADDRESSES } from "constants/addresses";
 import { BigNumber } from "ethers";
 import { defaultAbiCoder } from "ethers/lib/utils";
+import { CallInterface } from "stateswap/orders/types";
 import { encodeFunctionSignature } from "utils/encoders";
 
 export const Selectors = {
     util: {
+        any: encodeFunctionSignature(
+            'any(bytes,address[7],uint8[2],uint256[6],bytes,bytes)'
+        ),
         receiveETH: encodeFunctionSignature("receiveETH(bytes,address[7],uint8,uint256[6],bytes)"
         ),
         split: encodeFunctionSignature(
@@ -26,7 +33,41 @@ export const Selectors = {
     }
 }
 
-export const Calls = {
+export const Call = {
+    erc721: {
+        transferFrom: function transferFrom(from: string, to: string, tokenId: string, erc721Contract: Erc721, erc721cAddress: string): CallInterface {
+
+            const callData = erc721Contract.interface.encodeFunctionData("transferFrom", [from.toLowerCase(), to.toLowerCase(), tokenId.toLowerCase()]);
+            return {
+                data: callData,
+                howToCall: 0,
+                target: erc721cAddress.toLowerCase()
+            }
+        }
+    },
+    erc20: {
+        transferFrom: function transferFrom(from: string, to: string, amount: string, erc20Contract: Erc20, erc20cAddress: string): CallInterface {
+            const callData = erc20Contract.interface.encodeFunctionData("transferFrom", [from, to, amount]);
+            return {
+                data: callData,
+                howToCall: 0,
+                target: erc20cAddress.toLowerCase()
+            }
+        }
+    },
+    utils: {
+        empty: function empty(chainId: number): CallInterface {
+            const call: CallInterface = {
+                target: STATESWAP_VERIFIER_ADDRESSES[chainId].toLowerCase(),
+                howToCall: 0,
+                data: encodeFunctionSignature('test()')
+            }
+            return call
+        }
+    }
+}
+
+export const VerifierCalls = {
     ERC20_Transfer: function ERC20_Transfer(
         erc20Address: string,
         erc20Amount: BigNumber): [selectorCall: string, extradataCall: string] {
@@ -62,6 +103,9 @@ export const Calls = {
 
 export const Extradata = {
     util: {
+        any: function any() {
+            return '0x'
+        },
         split: function split(
             {
                 addressCall,

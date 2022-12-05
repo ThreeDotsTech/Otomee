@@ -1,18 +1,16 @@
-import { TypedDataSigner } from '@ethersproject/abstract-signer';
+
 import { Web3Provider } from '@ethersproject/providers';
 import { WETH_ADDRESSES } from 'constants/addresses';
 import { SupportedNFTInterfaces } from 'constants/ERC165';
 import { parseEther } from 'ethers/lib/utils';
-import { useERC20Contract, useERC721Contract, useStateswapAtomizicerContract, useStateswapExchangeContract } from 'hooks/useContract';
+import { useERC20Contract, useStateswapAtomizicerContract } from 'hooks/useContract';
 import { useERC165 } from 'hooks/useERC165';
-import { create_ERC20_ERC721_OfferWithFees, create_ERC721_WETH_OR_ETH_Offer } from 'hooks/useExchangeContract';
+import { createErc721_WethOrEthOffer, createWETH_Erc721Order } from 'hooks/useExchangeContract';
 import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
-import { start } from 'repl';
 import styled from 'styled-components';
 import { OrderWrapperInterface } from 'stateswap/orders/types';
 import { isToday } from 'utils'
-import { SignerExtended, wrap } from 'utils/exchangeWrapper';
 import { ReactComponent as Close } from '../../assets/images/x.svg'
 
 const CloseIcon = styled.div`
@@ -167,7 +165,7 @@ export default function MakeOffer({
             <button onClick={() => {
                 if (!chainId || !endDate) return
                 setWrappedOrder(
-                    isOwner ? create_ERC721_WETH_OR_ETH_Offer({
+                    isOwner ? createErc721_WethOrEthOffer({
                         maker: account,
                         owner,
                         erc721Address: contractAddress,
@@ -175,21 +173,13 @@ export default function MakeOffer({
                         chainId,
                         price: parseEther(price as string),
                         expirationTime: endDate.getTime()
-                    }).getOrbitDBSafeOrderWrapper() : create_ERC20_ERC721_OfferWithFees({
+                    }).getOrbitDBSafeOrderWrapper() : createWETH_Erc721Order({
                         maker: account,
-                        owner,
                         erc721Address: contractAddress,
                         tokenId: id,
-                        erc20Address: WETH_ADDRESSES[chainId],
-                        erc20Amount: parseEther(price as string),
-                        protocolFee: 30,
-                        protocolFeeReceiver: '0x77e2415dfc1Bc4ef3455441861aA12fC1184bd66',
-                        creatorFee: 100,
-                        creatorFeeReceiver: '0x02aCb57384d82c6F0875030032b3f248EB46b327',
+                        wethAmount: parseEther(price as string),
                         expirationTime: endDate.getTime(),
-                        chainId: chainId,
-                        erc20c,
-                        atomicizerc
+                        chainId: chainId
                     }
                     )
                 )

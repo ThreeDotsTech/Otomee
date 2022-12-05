@@ -1,8 +1,6 @@
 import { OrderType, OrderWrapperInterface } from 'stateswap/orders/types'
 import styled from 'styled-components/macro'
-import { MAKE_OFFER_VIEWS } from '.'
 import { ReactComponent as Close } from '../../assets/images/x.svg'
-import { ArrowLeft } from 'react-feather'
 import Row from 'components/Row'
 import { ThemedText } from '../../theme'
 import { ReactComponent as Checkmark } from '../../assets/svg/checkmark.svg'
@@ -11,7 +9,7 @@ import { AddressZero, MaxUint256 } from '@ethersproject/constants'
 import { CallState } from '@uniswap/redux-multicall/dist/types'
 import { StateswapRegistry } from 'abis/types/StateswapRegistry'
 import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg'
-import { createOrderAcceptAny } from 'hooks/useExchangeContract'
+import { createAny_AnyOrder } from 'hooks/useExchangeContract'
 import { splitSignature } from 'ethers/lib/utils'
 import { NULL_SIG, ZERO_BYTES32 } from 'constants/misc'
 import { useERC20Contract, useERC721Contract, useStateswapExchangeContract } from 'hooks/useContract'
@@ -19,6 +17,7 @@ import { wrap } from 'utils/exchangeWrapper'
 import { WETH_ADDRESSES } from 'constants/addresses'
 import { Call } from 'stateswap/verifiers'
 import DocumentStore from 'orbit-db-docstore'
+
 const CloseIcon = styled.div`
   position: absolute;
   right: 1rem;
@@ -65,18 +64,6 @@ const UpperSection = styled.div`
   }
 `
 
-const HoverText = styled.div`
-  text-decoration: none;
-  color: ${({ theme }) => theme.text1};
-  display: flex;
-  align-items: center;
-
-  :hover {
-    cursor: pointer;
-  }
-`
-
-
 export function MatchView(
     {
         name,
@@ -98,9 +85,7 @@ export function MatchView(
         setSuccess,
         setwaitingForTX,
         setethWETH,
-        setWalletView,
         toggleWalletModal,
-        setWrappedOrder
     }: {
         name: string,
         contractAddress: string,
@@ -121,8 +106,6 @@ export function MatchView(
         setSuccess: React.Dispatch<React.SetStateAction<boolean>>,
         setethWETH: React.Dispatch<React.SetStateAction<boolean>>
         toggleWalletModal: () => void,
-        setWalletView: React.Dispatch<React.SetStateAction<string>>,
-        setWrappedOrder: React.Dispatch<React.SetStateAction<OrderWrapperInterface | undefined>>,
         db: DocumentStore<OrderWrapperInterface>
     }
 ) {
@@ -388,14 +371,9 @@ export function MatchView(
                                                 } else {
                                                     if (!chainId || !account || !selectedOrder.signature || !erc721c) return
                                                     //Ready to match ETH for ERC721
-                                                    const orderAcceptAny = createOrderAcceptAny(account, chainId)
+                                                    const orderAcceptAny = createAny_AnyOrder(account, chainId)
                                                     const emptyCall = Call.utils.empty(chainId)
                                                     const erc721TransferCall = Call.erc721.transferFrom(selectedOrder.maker, account, selectedOrder.target, erc721c, selectedOrder.collection)
-
-                                                    console.log(orderAcceptAny)
-                                                    console.log(emptyCall)
-                                                    console.log(selectedOrder)
-                                                    console.log(erc721TransferCall)
                                                     exchange?.stateswapWith(selectedOrder.order, selectedOrder.signature, erc721TransferCall, orderAcceptAny, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
                                                         .then(
                                                             (tx: ContractTransaction) => {
@@ -468,14 +446,9 @@ export function MatchView(
                                             } else {
                                                 //Ready to accept the order
                                                 if (!chainId || !account || !selectedOrder.signature || !erc721c || !erc20c) return
-                                                const OrderAcceptAny = createOrderAcceptAny(account, chainId)
+                                                const OrderAcceptAny = createAny_AnyOrder(account, chainId)
                                                 const erc20TransferCall = Call.erc20.transferFrom(account, selectedOrder.maker, selectedOrder.price, erc20c, WETH_ADDRESSES[chainId])
                                                 const erc721TransferCall = Call.erc721.transferFrom(selectedOrder.maker, account, selectedOrder.target, erc721c, selectedOrder.collection)
-
-                                                console.log(OrderAcceptAny)
-                                                console.log(erc20TransferCall)
-                                                console.log(selectedOrder)
-                                                console.log(erc721TransferCall)
                                                 exchange?.stateswap(selectedOrder.order, selectedOrder.signature, erc721TransferCall, OrderAcceptAny, splitSignature(NULL_SIG), erc20TransferCall, ZERO_BYTES32)
                                                     .then(
                                                         (tx: ContractTransaction) => {

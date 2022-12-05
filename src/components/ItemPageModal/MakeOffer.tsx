@@ -177,19 +177,12 @@ export default function MakeOffer({
                         expirationTime: endDate.getTime()
                     }).getOrbitDBSafeOrderWrapper() : create_ERC20_ERC721_OfferWithFees({
                         maker: account,
-                        owner,
                         erc721Address: contractAddress,
                         tokenId: id,
                         erc20Address: WETH_ADDRESSES[chainId],
                         erc20Amount: parseEther(price as string),
-                        protocolFee: 30,
-                        protocolFeeReceiver: '0x77e2415dfc1Bc4ef3455441861aA12fC1184bd66',
-                        creatorFee: 100,
-                        creatorFeeReceiver: '0x02aCb57384d82c6F0875030032b3f248EB46b327',
                         expirationTime: endDate.getTime(),
-                        chainId: chainId,
-                        erc20c,
-                        atomicizerc
+                        chainId: chainId
                     }
                     )
                 )

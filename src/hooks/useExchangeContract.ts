@@ -61,110 +61,86 @@ function createCalldata_ERC20_Transfer_with_Fee(
     return [selectorCall, extradataCall]
 }
 
+export function createWETH_Erc721Offer(
+    { maker,
+        erc721Address,
+        tokenId,
+        erc20Amount,
+        expirationTime,
+        chainId,
+    }: {
+        maker: string,
+        erc721Address: string,
+        tokenId: string,
+        erc20Amount: BigNumber,
+        expirationTime: number,
+        chainId: number,
+    }): OrderWrapperInterface {
+    return create_ERC20_ERC721_OfferWithFees(
+        {
+            maker: maker,
+            erc721Address: erc721Address,
+            erc20Address: WETH_ADDRESSES[chainId],
+            tokenId: tokenId,
+            erc20Amount: erc20Amount,
+            expirationTime: expirationTime,
+            chainId: chainId
+        }
+    )
+}
+
 export function create_ERC20_ERC721_OfferWithFees({
     maker,
-    owner,
     erc721Address,
-    tokenId,
     erc20Address,
+    tokenId,
     erc20Amount,
-    protocolFee,
-    protocolFeeReceiver,
-    creatorFee,
-    creatorFeeReceiver,
     expirationTime,
     chainId,
-    erc20c,
-    atomicizerc
 }: {
     maker: string,
-    owner: string,
     erc721Address: string,
     tokenId: string,
     erc20Address: string,
     erc20Amount: BigNumber,
-    protocolFee: number,
-    protocolFeeReceiver: string,
-    creatorFee: number,
-    creatorFeeReceiver: string,
     expirationTime: number,
     chainId: number,
-    erc20c: Erc20 | null,
-    atomicizerc: StateswapAtomicizer | null
 }): OrderWrapperInterface {
-    const fee1 = ((erc20Amount.mul(protocolFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
-    const fee2 = ((erc20Amount.mul(creatorFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
 
+    const splitSelector = Selectors.util.split;
 
-    const selector = encodeFunctionSignature(
-        "split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)"
-    );
+    // Call should be an ERC20 transfer to recipient
 
-    // Call should be an ERC20 transfer to recipient + fees
-
-    const [selectorCall, extradataCall] = createCalldata_ERC20_Transfer_with_Fee(chainId, erc20Address, erc20Amount, fee1, fee2, protocolFeeReceiver, creatorFeeReceiver)
+    const [erc20TransferSelector, erc20TransferExtradata] = VerifierCalls.ERC20_Transfer(erc20Address, erc20Amount);
 
     // Countercall should be an ERC721 transfer
 
-    const [selectorCountercall, extradataCountercall] = VerifierCalls.ERC721_Transfer(erc721Address, tokenId)
+    const [erc721TransferSelector, erc721TransferExtradata] = VerifierCalls.ERC721_Transfer(erc721Address, tokenId);
 
-    const extradata = defaultAbiCoder.encode(
-        ["address[2]", "bytes4[2]", "bytes", "bytes"],
-        [
-            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
-            [selectorCall, selectorCountercall],
-            extradataCall,
-            extradataCountercall,
-        ]
-    );
+    const splitExtradata = Extradata.util.split({
+        addressCall: STATESWAP_VERIFIER_ADDRESSES[chainId],
+        selectorCall: erc20TransferSelector,
+        extradataCall: erc20TransferExtradata,
+        addressCountercall: STATESWAP_VERIFIER_ADDRESSES[chainId],
+        selectorCountercall: erc721TransferSelector,
+        extradataCountercall: erc721TransferExtradata
+    });
 
-    //Registry will be retrieved and assigned later.
-    const order: OrderInterface = {
-        registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
-        maker: maker,
-        verifierTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
-        verifierSelector: selector,
-        verifierExtradata: extradata,
-        maximumFill: 1,
-        listingTime: 0,
-        expirationTime: expirationTime,
-        salt: ArrayToNumber(randomBytes(31))._hex,
-    }
+    const order = new Order()
+        .setRegistry(STATESWAP_REGISTRY_ADDRESSES[chainId])
+        .setMaker(maker)
+        .setVerifierTarget(STATESWAP_VERIFIER_ADDRESSES[chainId])
+        .setVerifierSelector(splitSelector)
+        .setVerifierExtradata(splitExtradata)
+        .setMaximumFill(1)
+        .setListingTime(0)
+        .setExpirationTime(expirationTime)
 
-
-
-    if (!erc20c || !atomicizerc) {
-        throw new Error("Invalid contracts");
-    }
-
-    const c1 = erc20c.interface.encodeFunctionData("transferFrom", [maker, owner, erc20Amount.sub(fee1).sub(fee2)])
-    const c2 = erc20c.interface.encodeFunctionData("transferFrom", [maker, protocolFeeReceiver, fee1])
-    const c3 = erc20c.interface.encodeFunctionData("transferFrom", [maker, creatorFeeReceiver, fee2])
-
-    const callData = atomicizerc.interface.encodeFunctionData("atomicize", [
-        [erc20Address, erc20Address, erc20Address],
-        [0, 0, 0],
-        [(c1.length - 2) / 2, (c2.length - 2) / 2, (c3.length - 2) / 2],
-        c1 + c2.slice(2) + c3.slice(2)]
-    )
-
-    const call = {
-        data: callData,
-        howToCall: 1,
-        target: STATESWAP_ATOMIZICER_ADDRESSES[chainId]
-    };
-
-    const orderWrapper: OrderWrapperInterface = {
-        call: call,
-        collection: erc721Address,
-        hash: undefined,
-        maker: maker,
-        order: order,
-        price: erc20Amount._hex,
-        signature: undefined,
-        target: tokenId,
-        type: OrderType.ERC20_FOR_ERC721,
-    }
+    const orderWrapper = new OrderWrapper(order)
+        .setCollection(erc721Address)
+        .setPrice(erc20Amount._hex)
+        .setTarget(tokenId)
+        .setType(OrderType.ERC20_FOR_ERC721)
 
     return orderWrapper
 
@@ -257,7 +233,6 @@ export function create_ERC721_WETH_OR_ETH_Offer({
             [(extradataERC721ForETH.length - 2) / 2, (extradataERC721ForERC20.length - 2) / 2],
             extradataERC721ForETH + extradataERC721ForERC20.slice(2)]
         ) */
-
 
     //Build order
     const order = new Order()
@@ -376,8 +351,6 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
         throw new Error("Invalid contracts");
     }
 
-
-
     const orderWrapper: OrderWrapperInterface = {
         call: undefined,
         collection: erc721Address.toLowerCase(),
@@ -389,7 +362,6 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
         target: tokenId,
         type: OrderType.ERC721_FOR_ETH_OR_WETH,
     }
-
     return orderWrapper
 
 }

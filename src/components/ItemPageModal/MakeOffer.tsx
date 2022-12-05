@@ -1,18 +1,16 @@
-import { TypedDataSigner } from '@ethersproject/abstract-signer';
+
 import { Web3Provider } from '@ethersproject/providers';
 import { WETH_ADDRESSES } from 'constants/addresses';
 import { SupportedNFTInterfaces } from 'constants/ERC165';
 import { parseEther } from 'ethers/lib/utils';
-import { useERC20Contract, useERC721Contract, useStateswapAtomizicerContract, useStateswapExchangeContract } from 'hooks/useContract';
+import { useERC20Contract, useStateswapAtomizicerContract } from 'hooks/useContract';
 import { useERC165 } from 'hooks/useERC165';
-import { createErc20_Erc721Order, createErc721_WethOrEthOffer, createWETH_Erc721Order } from 'hooks/useExchangeContract';
+import { createErc721_WethOrEthOffer, createWETH_Erc721Order } from 'hooks/useExchangeContract';
 import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
-import { start } from 'repl';
 import styled from 'styled-components';
 import { OrderWrapperInterface } from 'stateswap/orders/types';
 import { isToday } from 'utils'
-import { SignerExtended, wrap } from 'utils/exchangeWrapper';
 import { ReactComponent as Close } from '../../assets/images/x.svg'
 
 const CloseIcon = styled.div`

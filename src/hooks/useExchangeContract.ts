@@ -1,9 +1,5 @@
 import { STATESWAP_REGISTRY_ADDRESSES, STATESWAP_VERIFIER_ADDRESSES, WETH_ADDRESSES } from "constants/addresses";
-import { defaultAbiCoder, randomBytes } from "ethers/lib/utils";
-import { ArrayToNumber } from "utils";
-import { encodeFunctionSignature } from "utils/encoders";
 import { OrderInterface, OrderType, OrderWrapperInterface } from "stateswap/orders/types";
-import { Erc721, StateswapAtomicizer } from "abis/types";
 import { BigNumber } from "ethers";
 import { VerifierCalls, Extradata, Selectors } from "stateswap/verifiers";
 import { Order } from "stateswap/orders/Order";

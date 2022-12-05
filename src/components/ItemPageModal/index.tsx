@@ -453,30 +453,28 @@ export default function ItemPageModal({
         if (modalAction == SaleAction.MATCH) {
             if (!selectedOrder || !chainId || !orbitdb || !orbitdb?.db) return
             return (
-                <MatchView                                    // G
+                <MatchView
                     name={name}
-                    contractAddress={contractAddress}         // o
+                    contractAddress={contractAddress}
                     account={account}
-                    chainId={chainId}                         // d
+                    chainId={chainId}
                     setwaitingForTX={setwaitingForTX}
-                    registryContract={registryContract}       // F
+                    registryContract={registryContract}
                     waitingForTX={waitingForTX}
-                    success={success}                         // o
+                    success={success}
                     proxyAllowance={proxyAllowance}
-                    proxyAddress={proxyAddress}               // r
+                    proxyAddress={proxyAddress}
                     ethWETH={ethWETH}
-                    isOwner={isOwner}                         // g
+                    isOwner={isOwner}
                     selectedOrder={selectedOrder}
-                    collectionName={collectionName}           // i
+                    collectionName={collectionName}
                     imageURL={imageURL}
-                    animationURL={animationURL}               // v
+                    animationURL={animationURL}
                     setethWETH={setethWETH}
-                    toggleWalletModal={toggleWalletModal}     // e
-                    setWalletView={setWalletView}
-                    setWrappedOrder={setWrappedOrder}         // M
+                    toggleWalletModal={toggleWalletModal}
                     setSuccess={setSuccess}
                     db={orbitdb.db}
-                />                                            // e
+                />
             )
         }
         if (modalAction == SaleAction.TRANSFER) {

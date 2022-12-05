@@ -11,7 +11,7 @@ import { AddressZero, MaxUint256 } from '@ethersproject/constants'
 import { CallState } from '@uniswap/redux-multicall/dist/types'
 import { StateswapRegistry } from 'abis/types/StateswapRegistry'
 import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg'
-import { createOrderAcceptAny } from 'hooks/useExchangeContract'
+import { createAny_AnyOrder } from 'hooks/useExchangeContract'
 import { splitSignature } from 'ethers/lib/utils'
 import { NULL_SIG, ZERO_BYTES32 } from 'constants/misc'
 import { useERC20Contract, useERC721Contract, useStateswapExchangeContract } from 'hooks/useContract'
@@ -388,7 +388,7 @@ export function MatchView(
                                                 } else {
                                                     if (!chainId || !account || !selectedOrder.signature || !erc721c) return
                                                     //Ready to match ETH for ERC721
-                                                    const orderAcceptAny = createOrderAcceptAny(account, chainId)
+                                                    const orderAcceptAny = createAny_AnyOrder(account, chainId)
                                                     const emptyCall = Call.utils.empty(chainId)
                                                     const erc721TransferCall = Call.erc721.transferFrom(selectedOrder.maker, account, selectedOrder.target, erc721c, selectedOrder.collection)
 
@@ -468,7 +468,7 @@ export function MatchView(
                                             } else {
                                                 //Ready to accept the order
                                                 if (!chainId || !account || !selectedOrder.signature || !erc721c || !erc20c) return
-                                                const OrderAcceptAny = createOrderAcceptAny(account, chainId)
+                                                const OrderAcceptAny = createAny_AnyOrder(account, chainId)
                                                 const erc20TransferCall = Call.erc20.transferFrom(account, selectedOrder.maker, selectedOrder.price, erc20c, WETH_ADDRESSES[chainId])
                                                 const erc721TransferCall = Call.erc721.transferFrom(selectedOrder.maker, account, selectedOrder.target, erc721c, selectedOrder.collection)
 

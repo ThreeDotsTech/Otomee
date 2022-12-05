@@ -5,7 +5,7 @@ import { SupportedNFTInterfaces } from 'constants/ERC165';
 import { parseEther } from 'ethers/lib/utils';
 import { useERC20Contract, useERC721Contract, useStateswapAtomizicerContract, useStateswapExchangeContract } from 'hooks/useContract';
 import { useERC165 } from 'hooks/useERC165';
-import { create_ERC20_ERC721_OfferWithFees, create_ERC721_WETH_OR_ETH_Offer } from 'hooks/useExchangeContract';
+import { createErc20_Erc721Order, createErc721_WethOrEthOffer, createWETH_Erc721Order } from 'hooks/useExchangeContract';
 import React, { useState } from 'react';
 import DatePicker from "react-datepicker";
 import { start } from 'repl';
@@ -167,7 +167,7 @@ export default function MakeOffer({
             <button onClick={() => {
                 if (!chainId || !endDate) return
                 setWrappedOrder(
-                    isOwner ? create_ERC721_WETH_OR_ETH_Offer({
+                    isOwner ? createErc721_WethOrEthOffer({
                         maker: account,
                         owner,
                         erc721Address: contractAddress,
@@ -175,12 +175,11 @@ export default function MakeOffer({
                         chainId,
                         price: parseEther(price as string),
                         expirationTime: endDate.getTime()
-                    }).getOrbitDBSafeOrderWrapper() : create_ERC20_ERC721_OfferWithFees({
+                    }).getOrbitDBSafeOrderWrapper() : createWETH_Erc721Order({
                         maker: account,
                         erc721Address: contractAddress,
                         tokenId: id,
-                        erc20Address: WETH_ADDRESSES[chainId],
-                        erc20Amount: parseEther(price as string),
+                        wethAmount: parseEther(price as string),
                         expirationTime: endDate.getTime(),
                         chainId: chainId
                     }

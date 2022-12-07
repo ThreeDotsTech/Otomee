@@ -44,7 +44,7 @@ const ItemsPage = () => {
     const [attributesElements, setattributesElements] = useState<JSX.Element[]>([])
     const [nftType, setnftType] = useState<SupportedNFTInterfaces>(SupportedNFTInterfaces.ERC721)
     const { is721, is1155, totalSupply, transfers, fetching, erc721Error, erc1155Error, executeQuery } = useGetExactTokenInfo(address, idString, 0)
-    const { image, title, description, collectionName, loading, attributesList, animation, owner } = useNFTMetadata(address, idString)
+    const nft = useNFTMetadata(address, idString)
     const { orbitdb } = useContext(OrbitContext)
     const [buyOrders, setBuyOrders] = useState<OrderWrapperInterface[]>([])
     const [sellOrders, setSellOrders] = useState<OrderWrapperInterface[]>([])
@@ -52,7 +52,7 @@ const ItemsPage = () => {
     const [_, setAction] = useSaleActionManager()
     const [__, setOrder] = useSaleOrderManager()
 
-    const isOwner = owner.toLowerCase() == account?.toLocaleLowerCase()
+    const isOwner = nft.owner.toLowerCase() == account?.toLocaleLowerCase()
 
     //Get buy offers for this NFT, sort by price.
     useEffect(() => {
@@ -90,16 +90,16 @@ const ItemsPage = () => {
 
     const itemPageModalToggle = useItemPageModalToggle()
 
-    const { ENSName } = useENSName(owner)
+    const { ENSName } = useENSName(nft.owner)
 
 
 
     useEffect(() => {
-        setattributesElements(attributesList?.map((attribute: { trait_type: string, value: string, }, index: number) => <Attribute key={index} trait_type={attribute.trait_type} value={attribute.value} />))
+        setattributesElements(nft.attributesList?.map((attribute: { trait_type: string, value: string, }, index: number) => <Attribute key={index} trait_type={attribute.trait_type} value={attribute.value} />))
         return function () {
             setattributesElements([])
         }
-    }, [attributesList])
+    }, [nft.attributesList])
 
     if (!chainId) return null
 
@@ -110,24 +110,24 @@ const ItemsPage = () => {
                     <div className="flex w-full justify-between ">
                         <div className="flex flex-col">
                             <div className="flex text-white rounded-full bg-gradient-to-r from-TDBlue via-TDGreen to-TDRed text-base p-1 self-start mb-2">
-                                {loading ? <h2 className="bg-gray-400 animate-pulse h-5 w-20 px-1 my-1"></h2> :
-                                    <Link to={'/collection/' + address} className="text-white font-normal mb-0 text-ellipsis px-1 ">{collectionName}</Link>}
+                                {nft.loading ? <h2 className="bg-gray-400 animate-pulse h-5 w-20 px-1 my-1"></h2> :
+                                    <Link to={'/collection/' + address} className="text-white font-normal mb-0 text-ellipsis px-1 ">{nft.collectionName}</Link>}
                                 <div className="rounded-full bg-white/25  font-extralight px-2 truncate max-w-xss">
-                                    {loading ? <h2 className="bg-gray-400  rounded-full animate-pulse my-1 h-5 w-10 truncate"></h2> :
+                                    {nft.loading ? <h2 className="bg-gray-400  rounded-full animate-pulse my-1 h-5 w-10 truncate"></h2> :
                                         idString}
                                 </div>
                             </div>
-                            {loading ? <h2 className="bg-gray-600 animate-pulse h-7 w-4/12 mb-2 mx-1 self-start"></h2> :
-                                <p className="text-3xl font-semibold text-black mb-0 text-ellipsis pb-2 self-start">{title}</p>}
+                            {nft.loading ? <h2 className="bg-gray-600 animate-pulse h-7 w-4/12 mb-2 mx-1 self-start"></h2> :
+                                <p className="text-3xl font-semibold text-black mb-0 text-ellipsis pb-2 self-start">{nft.name}</p>}
 
                             <div className="flex w-full items-center self-start">
-                                {loading ? <h2 className="bg-gray-400 animate-pulse h-6 w-20 mr-1"></h2> //Show a placeholder while the subgraph loads
+                                {nft.loading ? <h2 className="bg-gray-400 animate-pulse h-6 w-20 mr-1"></h2> //Show a placeholder while the subgraph loads
                                     : (is721 ? //If it's a 721, show the owner
                                         <> <div className="mr-1">Owner:</div>
                                             <AvatarWrapper>
-                                                {fetching ? <h2 className="bg-gray-400 animate-pulse h-6 w-6 rounded-full"></h2> : <Identicon externalAddress={owner} jazzIconDiameter={24} />}
+                                                {fetching ? <h2 className="bg-gray-400 animate-pulse h-6 w-6 rounded-full"></h2> : <Identicon externalAddress={nft.owner} jazzIconDiameter={24} />}
                                             </AvatarWrapper>
-                                            {fetching ? <h2 className="bg-gray-400 animate-pulse h-6 w-20 mr-1"></h2> : <Link to={'/profile/' + owner} className='ml-1 font-semibold'> {(ENSName || shortenAddress(owner))} </Link>}
+                                            {fetching ? <h2 className="bg-gray-400 animate-pulse h-6 w-20 mr-1"></h2> : <Link to={'/profile/' + nft.owner} className='ml-1 font-semibold'> {(ENSName || shortenAddress(nft.owner))} </Link>}
                                         </> : // If its a 1155, show the total supply
                                         <>
                                             <div className="mr-1">Supply:</div>
@@ -156,21 +156,21 @@ const ItemsPage = () => {
                         <div className="flex flex-col justify-start items-center overflow-x-hidden w-7/12 pr-20">
 
                             <div className="flex justify-center overflow-x-hidden  max-w-xl max-h-min rounded-3xl shadow-2xl bg-slate-200 mb-4 items-center">
-                                {loading ?
+                                {nft.loading ?
                                     <h2 className="bg-gray-400 animate-pulse aspect-square h-96"></h2> :
-                                    animation != '' ?
-                                        <video className="bg-black w-full aspect-video object-contain" src={animation} autoPlay={true} controls={true} loop={true} />
-                                        : <img className="h-full object-contain" src={image} />}
+                                    nft.animationURL != '' ?
+                                        <video className="bg-black w-full aspect-video object-contain" src={nft.animationURL} autoPlay={true} controls={true} loop={true} />
+                                        : <img className="h-full object-contain" src={nft.imageURL} />}
                             </div>
 
-                            {loading ? <h2 className="bg-gray-300 animate-pulse h-36 w-full mt-3"></h2> :
+                            {nft.loading ? <h2 className="bg-gray-300 animate-pulse h-36 w-full mt-3"></h2> :
                                 <p className="text-sm text-justify font-normal text-gray-700 mb-0 text-ellipsis pb-5 mt-3"> <Linkify componentDecorator={(decoratedHref: string, decoratedText: string, key: number): React.ReactNode => {
                                     return (
                                         <a href={decoratedHref} target="_blank" rel="noreferrer" key={key}>
                                             {decoratedText}
                                         </a>
                                     );
-                                }}>{description}</Linkify></p>}
+                                }}>{nft.description}</Linkify></p>}
                             <p className="font-semibold text-lg py-2 self-start">PROPERTIES</p>
                             <div className="grid grid-cols-3 gap-3 w-full px-2">
                                 {attributesElements}
@@ -198,8 +198,8 @@ const ItemsPage = () => {
 
                         <div className="flex flex-col items-start w-5/12 -ml-10">
 
-                            <ItemStatus loading={loading} itemPageModalToggle={itemPageModalToggle} owner={owner} address={address} identifier={idString} buyOrders={buyOrders} sellOrders={sellOrders} />
-                            <NFTDetailTabs transfers={transfers} orders={buyOrders} listings={sellOrders} owner={owner} />
+                            <ItemStatus loading={nft.loading} itemPageModalToggle={itemPageModalToggle} owner={nft.owner} address={address} identifier={idString} buyOrders={buyOrders} sellOrders={sellOrders} />
+                            <NFTDetailTabs transfers={transfers} orders={buyOrders} listings={sellOrders} owner={nft.owner} />
 
 
                         </div>
@@ -207,7 +207,7 @@ const ItemsPage = () => {
                 </div>
             </>
             {(contextNetwork.active || active) && (
-                <ItemPageModal contractAddress={address} owner={owner} collectionName={collectionName} name={title} imageURL={image} animationURL={animation} id={idString} reloadNFTData={executeQuery} />
+                <ItemPageModal nft={nft} reloadNFTData={executeQuery} />
             )}
         </AppBody>
     )

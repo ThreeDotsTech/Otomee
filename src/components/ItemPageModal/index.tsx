@@ -44,6 +44,7 @@ import useENSAvatar from 'hooks/useENSAvatar'
 import Identicon from 'components/Identicon'
 import { MatchView } from './Match'
 import Confetti from 'components/Confetti'
+import { NftInterface } from 'types/nft'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -156,22 +157,10 @@ overflow: clip;
 `
 
 export default function ItemPageModal({
-    contractAddress,
-    collectionName,
-    owner,
-    name,
-    id,
-    imageURL,
-    animationURL,
+    nft,
     reloadNFTData
 }: {
-    owner: string
-    contractAddress: string,
-    collectionName: string,
-    name: string,
-    id: string,
-    imageURL: string,
-    animationURL: string
+    nft: NftInterface
     reloadNFTData: () => void
 }) {
     // important that these are destructed from the account-specific web3-react context
@@ -193,7 +182,7 @@ export default function ItemPageModal({
 
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
 
-    const erc721c = useERC721Contract(contractAddress)
+    const erc721c = useERC721Contract(nft.contractAddress)
 
     const exchangec = useStateswapExchangeContract(true)
 
@@ -214,7 +203,7 @@ export default function ItemPageModal({
 
     const [selectedOrder, setOrder] = useSaleOrderManager()
 
-    const isOwner = owner.toLowerCase() == account?.toLocaleLowerCase()
+    const isOwner = nft.owner.toLowerCase() == account?.toLocaleLowerCase()
 
     const [destination, setDestination] = useState<string>('')
 
@@ -454,8 +443,7 @@ export default function ItemPageModal({
             if (!selectedOrder || !chainId || !orbitdb || !orbitdb?.db) return
             return (
                 <MatchView
-                    name={name}
-                    contractAddress={contractAddress}
+                    nft={nft}
                     account={account}
                     chainId={chainId}
                     setwaitingForTX={setwaitingForTX}
@@ -467,9 +455,6 @@ export default function ItemPageModal({
                     ethWETH={ethWETH}
                     isOwner={isOwner}
                     selectedOrder={selectedOrder}
-                    collectionName={collectionName}
-                    imageURL={imageURL}
-                    animationURL={animationURL}
                     setethWETH={setethWETH}
                     toggleWalletModal={toggleWalletModal}
                     setSuccess={setSuccess}
@@ -494,11 +479,11 @@ export default function ItemPageModal({
                         <div className='flex justify-start w-full mb-4'>
                             <div className="flex">
                                 <div className="flex w-5/12 justify-center overflow-x-hidden aspect-square rounded-lg relative bg-slate-200">
-                                    {(imageURL == '' && animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={imageURL} />}
+                                    {(nft.imageURL == '' && nft.animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={nft.animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={nft.imageURL} />}
                                 </div>
                                 <div className="flex flex-col items-start w-7/12 justify-center ml-2 px-2">
-                                    <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{collectionName}</p>
-                                    <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{name}</p>
+                                    <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{nft.collectionName}</p>
+                                    <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{nft.name}</p>
 
                                 </div>
 
@@ -535,7 +520,7 @@ export default function ItemPageModal({
                             <button onClick={() => {
                                 if (!account) return
 
-                                erc721c?.transferFrom(account, destination, id).then((tx: ContractTransaction) => {
+                                erc721c?.transferFrom(account, destination, nft.id).then((tx: ContractTransaction) => {
                                     tx.wait(1).then(() => {
                                         console.log('nftSent')
                                         setwaitingForTX(false)
@@ -637,7 +622,7 @@ export default function ItemPageModal({
         }
         if (account && walletView === MAKE_OFFER_VIEWS.OFFER) {
             return (
-                <MakeOffer library={library} owner={owner} account={account} chainId={chainId} setWrappedOrder={setWrappedOrder} contractAddress={contractAddress} toggleWalletModal={toggleWalletModal} setWalletView={setWalletView} collectionName={collectionName} name={name} imageURL={imageURL} animationURL={animationURL} id={id} />
+                <MakeOffer nft={nft} account={account} chainId={chainId} setWrappedOrder={setWrappedOrder} toggleWalletModal={toggleWalletModal} setWalletView={setWalletView} />
             )
         }
         if (account && walletView === MAKE_OFFER_VIEWS.STATUS) {
@@ -667,11 +652,11 @@ export default function ItemPageModal({
                         <div className='flex justify-start w-full mb-4'>
                             <div className="flex">
                                 <div className="flex w-5/12 justify-center overflow-x-hidden aspect-square rounded-lg relative bg-slate-200">
-                                    {(imageURL == '' && animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={imageURL} />}
+                                    {(nft.imageURL == '' && nft.animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={nft.animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={nft.imageURL} />}
                                 </div>
                                 <div className="flex flex-col items-start w-7/12 justify-center ml-2 px-2">
-                                    <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{collectionName}</p>
-                                    <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{name}</p>
+                                    <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{nft.collectionName}</p>
+                                    <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{nft.name}</p>
                                     <div className=" flex items-center text-lg font-semibold text-gray-900 mb-0 text-clip grow border-t w-full justify-start">
                                         <div className="flex">
                                             <p className='text-gray-600 mr-2'>Price: </p>

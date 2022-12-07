@@ -17,6 +17,7 @@ import { wrap } from 'utils/exchangeWrapper'
 import { WETH_ADDRESSES } from 'constants/addresses'
 import { Call } from 'stateswap/verifiers'
 import DocumentStore from 'orbit-db-docstore'
+import { NftInterface } from 'types/nft'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -66,7 +67,7 @@ const UpperSection = styled.div`
 
 export function MatchView(
     {
-        name,
+        nft,
         registryContract,
         waitingForTX,
         success,
@@ -74,21 +75,16 @@ export function MatchView(
         ethWETH,
         isOwner,
         selectedOrder,
-        collectionName,
-        imageURL,
-        animationURL,
         proxyAllowance,
         chainId,
         account,
-        contractAddress,
         db,
         setSuccess,
         setwaitingForTX,
         setethWETH,
         toggleWalletModal,
     }: {
-        name: string,
-        contractAddress: string,
+        nft: NftInterface,
         account: string | null | undefined,
         chainId: number,
         setwaitingForTX: React.Dispatch<React.SetStateAction<boolean>>,
@@ -100,16 +96,13 @@ export function MatchView(
         ethWETH: boolean,
         isOwner: boolean,
         selectedOrder: OrderWrapperInterface,
-        collectionName: string,
-        imageURL: string,
-        animationURL: string,
         setSuccess: React.Dispatch<React.SetStateAction<boolean>>,
         setethWETH: React.Dispatch<React.SetStateAction<boolean>>
         toggleWalletModal: () => void,
         db: DocumentStore<OrderWrapperInterface>
     }
 ) {
-    const erc721c = useERC721Contract(contractAddress)
+    const erc721c = useERC721Contract(nft.contractAddress)
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
     const exchangec = useStateswapExchangeContract(true)
     const exchange = wrap(exchangec)
@@ -130,11 +123,11 @@ export function MatchView(
                 <div className='flex justify-start w-full mb-4'>
                     <div className="flex">
                         <div className="flex w-5/12 justify-center overflow-x-hidden aspect-square rounded-lg relative bg-slate-200">
-                            {(imageURL == '' && animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={imageURL} />}
+                            {(nft.imageURL == '' && nft.animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={nft.animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={nft.imageURL} />}
                         </div>
                         <div className="flex flex-col items-start w-7/12 justify-center ml-2 px-2">
-                            <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{collectionName}</p>
-                            <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{name}</p>
+                            <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{nft.collectionName}</p>
+                            <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{nft.name}</p>
                             <div className=" flex flex-col  items-start text-lg font-semibold text-gray-900 mb-0 text-clip grow border-t w-full justify-start">
                                 <div className="flex ">
                                     <p className='text-gray-600 mr-2'>Price: </p>

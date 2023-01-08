@@ -210,13 +210,13 @@ export function useGetNFTsFromAccount(address: string, first: number, skip = 0):
     }, [erc721Data, erc1155Data, erc721Fetching, erc1155Fetching, erc721Error, erc1155Error, executeErc721Query, executeErc1155Query])
 }
 
-export function useGetExactTokenInfo(address: string, idString: string, first: number, skip = 0): {
+export function useGetExactTokenInfo(address: string, idString: string): {
     is721: boolean,
     is1155: boolean,
     owner: string,
     totalSupply: number,
     transfers: any[],
-    fetching: boolean,
+    fetchingSubgraph: boolean,
     erc721Error: CombinedError | undefined,
     erc1155Error: CombinedError | undefined,
     executeQuery: () => void
@@ -239,7 +239,7 @@ export function useGetExactTokenInfo(address: string, idString: string, first: n
             owner: erc721owner ?? '',
             totalSupply: totalSupply ?? 1,
             transfers: [..._erc721transfers, ..._erc1155transfers],
-            fetching: erc721fetching || erc1155fetching,
+            fetchingSubgraph: erc721fetching || erc1155fetching,
             erc721Error: erc721error,
             erc1155Error: erc1155error,
             executeQuery: executeQuery

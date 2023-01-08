@@ -33,10 +33,10 @@ import { Status } from './Status'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper'
 import { splitSignature } from 'ethers/lib/utils'
 import { WETH_ADDRESSES } from 'constants/addresses'
-import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
+import { useItemPageModalIntentionManager, useItemPageOrderManager } from 'state/itemPage/hooks'
 import OrbitContext from 'state/orbitdb/orbitContext'
 import { ContractReceipt, ContractTransaction, utils } from 'ethers'
-import { SaleAction } from 'state/sale/reducer'
+import { ModalIntention } from 'state/itemPage/reducer'
 import { useGetNumberOfErc721Transfers } from 'hooks/useSubgraph'
 import { isAddress, shortenAddress } from 'utils'
 import useENSAddress from 'hooks/useENSAddress'
@@ -44,6 +44,7 @@ import useENSAvatar from 'hooks/useENSAvatar'
 import Identicon from 'components/Identicon'
 import { MatchView } from './Match'
 import Confetti from 'components/Confetti'
+import { NftInterface } from 'types/nft'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -138,8 +139,6 @@ const LinkCard = styled(Card)`
 `
 
 export const MAKE_OFFER_VIEWS = {
-    OPTIONS: 'options',
-    OPTIONS_SECONDARY: 'options_secondary',
     OFFER: 'offer',
     PENDING: 'pending',
     LEGAL: 'legal',
@@ -156,22 +155,10 @@ overflow: clip;
 `
 
 export default function ItemPageModal({
-    contractAddress,
-    collectionName,
-    owner,
-    name,
-    id,
-    imageURL,
-    animationURL,
+    nft,
     reloadNFTData
 }: {
-    owner: string
-    contractAddress: string,
-    collectionName: string,
-    name: string,
-    id: string,
-    imageURL: string,
-    animationURL: string
+    nft: NftInterface
     reloadNFTData: () => void
 }) {
     // important that these are destructed from the account-specific web3-react context
@@ -193,7 +180,7 @@ export default function ItemPageModal({
 
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
 
-    const erc721c = useERC721Contract(contractAddress)
+    const erc721c = useERC721Contract(nft.contractAddress)
 
     const exchangec = useStateswapExchangeContract(true)
 
@@ -210,11 +197,11 @@ export default function ItemPageModal({
     const [success, setSuccess] = useState<boolean>(false)
     const [waitingForTX, setwaitingForTX] = useState<boolean>(false)
 
-    const [modalAction, setAction] = useSaleActionManager()
+    const [modalIntention, setModelIntention] = useItemPageModalIntentionManager()
 
-    const [selectedOrder, setOrder] = useSaleOrderManager()
+    const [selectedOrder, setOrder] = useItemPageOrderManager()
 
-    const isOwner = owner.toLowerCase() == account?.toLocaleLowerCase()
+    const isOwner = nft.owner.toLowerCase() == account?.toLocaleLowerCase()
 
     const [destination, setDestination] = useState<string>('')
 
@@ -232,8 +219,6 @@ export default function ItemPageModal({
     })
 
     const { numberOfErc721Transfers,
-        numberOfErc721Transferserror,
-        numberOfErc721Transfersfetching,
         numberOfErc721TransfersExecuteQuery } = useGetNumberOfErc721Transfers(account ?? '', isAddress(destination) ? destination : address ?? '')
 
     const onChangeDestination = (event: any) => {
@@ -259,7 +244,7 @@ export default function ItemPageModal({
 
     //Once the wrapped Order has been created, ask for the user's signature.
     useEffect(() => {
-        if (!wrappedOrder?.order || !account || !chainId || !proxyAddress?.result || !proxyAllowance?.result || signing || modalAction) return
+        if (!wrappedOrder?.order || !account || !chainId || !proxyAddress?.result || !proxyAllowance?.result || signing || modalIntention) return
 
         if (proxyAddress?.result[0] == AddressZero || (isOwner ? proxyAllowance?.result[0] == false : (proxyAllowance?.result[0]._hex != MaxUint256._hex))) return
         setSigning(true)
@@ -304,7 +289,7 @@ export default function ItemPageModal({
         } else {
             setWrappedOrder(undefined)
             setSuccess(false)
-            setAction(null)
+            setModelIntention(null)
             setOrder(null)
             setENSDestination('')
             setDestination('')
@@ -450,34 +435,12 @@ export default function ItemPageModal({
                 </UpperSection>
             )
         }
-        if (modalAction == SaleAction.MATCH) {
-            if (!selectedOrder || !chainId || !orbitdb || !orbitdb?.db) return
+        if (modalIntention == ModalIntention.MATCH) {
             return (
-                <MatchView
-                    name={name}
-                    contractAddress={contractAddress}
-                    account={account}
-                    chainId={chainId}
-                    setwaitingForTX={setwaitingForTX}
-                    registryContract={registryContract}
-                    waitingForTX={waitingForTX}
-                    success={success}
-                    proxyAllowance={proxyAllowance}
-                    proxyAddress={proxyAddress}
-                    ethWETH={ethWETH}
-                    isOwner={isOwner}
-                    selectedOrder={selectedOrder}
-                    collectionName={collectionName}
-                    imageURL={imageURL}
-                    animationURL={animationURL}
-                    setethWETH={setethWETH}
-                    toggleWalletModal={toggleWalletModal}
-                    setSuccess={setSuccess}
-                    db={orbitdb.db}
-                />
+                <MatchView success={success} setSuccess={setSuccess} />
             )
         }
-        if (modalAction == SaleAction.TRANSFER) {
+        if (modalIntention == ModalIntention.TRANSFER) {
             return (
                 <UpperSection>
                     <CloseIcon onClick={toggleWalletModal}>
@@ -494,11 +457,11 @@ export default function ItemPageModal({
                         <div className='flex justify-start w-full mb-4'>
                             <div className="flex">
                                 <div className="flex w-5/12 justify-center overflow-x-hidden aspect-square rounded-lg relative bg-slate-200">
-                                    {(imageURL == '' && animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={imageURL} />}
+                                    {(nft.imageURL == '' && nft.animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={nft.animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={nft.imageURL} />}
                                 </div>
                                 <div className="flex flex-col items-start w-7/12 justify-center ml-2 px-2">
-                                    <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{collectionName}</p>
-                                    <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{name}</p>
+                                    <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{nft.collectionName}</p>
+                                    <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{nft.name}</p>
 
                                 </div>
 
@@ -535,7 +498,7 @@ export default function ItemPageModal({
                             <button onClick={() => {
                                 if (!account) return
 
-                                erc721c?.transferFrom(account, destination, id).then((tx: ContractTransaction) => {
+                                erc721c?.transferFrom(account, destination, nft.id).then((tx: ContractTransaction) => {
                                     tx.wait(1).then(() => {
                                         console.log('nftSent')
                                         setwaitingForTX(false)
@@ -560,7 +523,7 @@ export default function ItemPageModal({
 
             )
         }
-        if (modalAction == SaleAction.CANCEL) {
+        if (modalIntention == ModalIntention.CANCEL) {
             return (
                 <UpperSection>
                     <CloseIcon onClick={toggleWalletModal}>
@@ -637,7 +600,7 @@ export default function ItemPageModal({
         }
         if (account && walletView === MAKE_OFFER_VIEWS.OFFER) {
             return (
-                <MakeOffer library={library} owner={owner} account={account} chainId={chainId} setWrappedOrder={setWrappedOrder} contractAddress={contractAddress} toggleWalletModal={toggleWalletModal} setWalletView={setWalletView} collectionName={collectionName} name={name} imageURL={imageURL} animationURL={animationURL} id={id} />
+                <MakeOffer nft={nft} account={account} chainId={chainId} setWrappedOrder={setWrappedOrder} toggleWalletModal={toggleWalletModal} setWalletView={setWalletView} />
             )
         }
         if (account && walletView === MAKE_OFFER_VIEWS.STATUS) {
@@ -667,11 +630,11 @@ export default function ItemPageModal({
                         <div className='flex justify-start w-full mb-4'>
                             <div className="flex">
                                 <div className="flex w-5/12 justify-center overflow-x-hidden aspect-square rounded-lg relative bg-slate-200">
-                                    {(imageURL == '' && animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={imageURL} />}
+                                    {(nft.imageURL == '' && nft.animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={nft.animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={nft.imageURL} />}
                                 </div>
                                 <div className="flex flex-col items-start w-7/12 justify-center ml-2 px-2">
-                                    <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{collectionName}</p>
-                                    <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{name}</p>
+                                    <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{nft.collectionName}</p>
+                                    <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{nft.name}</p>
                                     <div className=" flex items-center text-lg font-semibold text-gray-900 mb-0 text-clip grow border-t w-full justify-start">
                                         <div className="flex">
                                             <p className='text-gray-600 mr-2'>Price: </p>
@@ -899,7 +862,7 @@ export default function ItemPageModal({
                             <AutoRow style={{ flexWrap: 'nowrap' }}>
                                 <ThemedText.Black fontSize={14}>
 
-                                    By connecting a wallet, you agree to Otomee’{' '}
+                                    By connecting a wallet, you agree to Otomee’s{' '}
                                     Terms of Service and
                                     acknowledge that you have read and understand the Otomee{' '}
                                     Protocol Disclaimer.
@@ -936,7 +899,7 @@ export default function ItemPageModal({
 
     return (
         <Modal isOpen={walletModalOpen} onDismiss={toggleWalletModal} minHeight={false} maxHeight={90}>
-            <Confetti start={success && modalAction == SaleAction.MATCH} />
+            <Confetti start={success && modalIntention == ModalIntention.MATCH} />
             <Wrapper>{getModalContent()}</Wrapper>
         </Modal>
     )

@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import { OrderWrapperInterface } from 'stateswap/orders/types';
 import { isToday } from 'utils'
 import { ReactComponent as Close } from '../../assets/images/x.svg'
+import { NftInterface } from 'types/nft';
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -32,29 +33,15 @@ const CloseColor = styled(Close)`
 export default function MakeOffer({
     account,
     chainId,
-    contractAddress,
-    collectionName,
-    owner,
-    name,
-    id,
-    imageURL,
-    animationURL,
-    library,
+    nft,
     toggleWalletModal,
     setWalletView,
     setWrappedOrder
 
 }: {
-    library: Web3Provider | undefined,
     account: string,
-    owner: string,
     chainId: number | undefined,
-    contractAddress: string,
-    collectionName: string,
-    name: string,
-    id: string,
-    imageURL: string,
-    animationURL: string
+    nft: NftInterface,
     toggleWalletModal: () => void
     setWalletView: React.Dispatch<React.SetStateAction<string>>
     setWrappedOrder: React.Dispatch<React.SetStateAction<OrderWrapperInterface | undefined>>
@@ -64,7 +51,7 @@ export default function MakeOffer({
     const [endDate, setEndDate] = useState<Date | null>(null);
     const [price, setPrice] = useState<number | undefined | string>('')
 
-    const Erc165Response = useERC165(contractAddress, [SupportedNFTInterfaces.ERC721, SupportedNFTInterfaces.ERC1155])
+    const Erc165Response = useERC165(nft.contractAddress, [SupportedNFTInterfaces.ERC721, SupportedNFTInterfaces.ERC1155])
     const isERC721 = Erc165Response[0].result?.[0]
     const isERC1155 = Erc165Response[1].result?.[0]
 
@@ -72,7 +59,7 @@ export default function MakeOffer({
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
     const atomicizerc = useStateswapAtomizicerContract(true)
 
-    const isOwner = owner.toLowerCase() == account.toLocaleLowerCase()
+    const isOwner = nft.owner.toLowerCase() == account.toLocaleLowerCase()
 
     const onChangePrice = (event: any) => {
         setPrice(event.target.value)
@@ -103,11 +90,11 @@ export default function MakeOffer({
         <div className="relative flex justify-between w-full">
             <div className="flex items-center ">
                 <div className="flex justify-center overflow-x-hidden w-1/4 aspect-square rounded-lg relative bg-slate-200">
-                    {(imageURL == '' && animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={imageURL} />}
+                    {(nft.imageURL == '' && nft.animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={nft.animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={nft.imageURL} />}
                 </div>
                 <div className="flex flex-col w-full ml-2">
-                    <p className="text-base font-semibold text-gray-600 mb-0 text-clip h-min ">{collectionName}</p>
-                    <p className="text-lg font-semibold text-gray-900 mb-0 text-clip ">{name}</p>
+                    <p className="text-base font-semibold text-gray-600 mb-0 text-clip h-min ">{nft.collectionName}</p>
+                    <p className="text-lg font-semibold text-gray-900 mb-0 text-clip ">{nft.name}</p>
                 </div>
             </div>
             <CloseIcon onClick={toggleWalletModal}>
@@ -167,16 +154,16 @@ export default function MakeOffer({
                 setWrappedOrder(
                     isOwner ? createErc721_WethOrEthOffer({
                         maker: account,
-                        owner,
-                        erc721Address: contractAddress,
-                        tokenId: id,
+                        owner: nft.owner,
+                        erc721Address: nft.contractAddress,
+                        tokenId: nft.id,
                         chainId,
                         price: parseEther(price as string),
                         expirationTime: endDate.getTime()
                     }).getOrbitDBSafeOrderWrapper() : createWETH_Erc721Order({
                         maker: account,
-                        erc721Address: contractAddress,
-                        tokenId: id,
+                        erc721Address: nft.contractAddress,
+                        tokenId: nft.id,
                         wethAmount: parseEther(price as string),
                         expirationTime: endDate.getTime(),
                         chainId: chainId

@@ -27,8 +27,8 @@ import { OrderType, OrderWrapperInterface } from 'stateswap/orders/types';
 import OrbitContext from 'state/orbitdb/orbitContext'
 import { BigNumber } from 'ethers';
 import { Send } from 'react-feather'
-import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
-import { SaleAction } from 'state/sale/reducer';
+import { useItemPageModalIntentionManager, useItemPageOrderManager } from 'state/itemPage/hooks'
+import { ModalIntention } from 'state/itemPage/reducer';
 
 const AvatarWrapper = styled.div`
 border-radius: 9999px;
@@ -49,8 +49,8 @@ const ItemsPage = () => {
     const [buyOrders, setBuyOrders] = useState<OrderWrapperInterface[]>([])
     const [sellOrders, setSellOrders] = useState<OrderWrapperInterface[]>([])
 
-    const [_, setAction] = useSaleActionManager()
-    const [__, setOrder] = useSaleOrderManager()
+    const [_, setModalIntention] = useItemPageModalIntentionManager()
+    const [__, setOrder] = useItemPageOrderManager()
 
     const isOwner = nft.owner.toLowerCase() == account?.toLocaleLowerCase()
 
@@ -144,7 +144,7 @@ const ItemsPage = () => {
                                     {isOwner && <Send className='mx-4 hover:scale-95 cursor-pointer' onClick={() => {
                                         itemPageModalToggle()
                                         if (isOwner) {
-                                            setAction(SaleAction.TRANSFER)
+                                            setModalIntention(ModalIntention.TRANSFER)
                                         }
                                     }} />}
                                 </div>

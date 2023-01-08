@@ -2,14 +2,14 @@ import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { OrderWrapperInterface } from "stateswap/orders/types";
 import { NftInterface } from "types/nft";
-import { updateOrderIntention, updateOrder, updateNFT } from "./actions";
-import { OrderIntention } from "./reducer";
+import { updateModalIntention, updateOrder, updateNFT } from "./actions";
+import { ModalIntention } from "./reducer";
 
 
 
-export function useItemPageOrderIntention(): OrderIntention | null {
+export function useItemPageModalIntention(): ModalIntention | null {
     const state = useAppSelector((state) => state.itemPage)
-    return state.OrderIntention
+    return state.modalIntention
 }
 
 export function useItemPageOrder(): OrderWrapperInterface | null {
@@ -22,18 +22,18 @@ export function useItemPageNFT(): NftInterface | null {
     return state.nft
 }
 
-export function useItemPageOrderIntentionManager(): [OrderIntention | null, (newAction: OrderIntention | null) => void] {
+export function useItemPageModalIntentionManager(): [ModalIntention | null, (newModalIntention: ModalIntention | null) => void] {
     const dispatch = useAppDispatch()
-    const orderIntention = useItemPageOrderIntention()
+    const modalIntention = useItemPageModalIntention()
 
     const setAction = useCallback(
-        (newAction: OrderIntention | null) => {
-            dispatch(updateOrderIntention({ orderIntention: newAction }))
+        (newModalIntention: ModalIntention | null) => {
+            dispatch(updateModalIntention({ modalIntention: newModalIntention }))
         },
         [dispatch]
     )
 
-    return [orderIntention, setAction]
+    return [modalIntention, setAction]
 }
 
 export function useItemPageOrderManager(): [OrderWrapperInterface | null, (newOrder: OrderWrapperInterface | null) => void] {

@@ -33,10 +33,10 @@ import { Status } from './Status'
 import { SignerExtended, wrap } from 'utils/exchangeWrapper'
 import { splitSignature } from 'ethers/lib/utils'
 import { WETH_ADDRESSES } from 'constants/addresses'
-import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
+import { useItemPageModalIntentionManager, useItemPageOrderManager } from 'state/itemPage/hooks'
 import OrbitContext from 'state/orbitdb/orbitContext'
 import { ContractReceipt, ContractTransaction, utils } from 'ethers'
-import { SaleAction } from 'state/sale/reducer'
+import { ModalIntention } from 'state/itemPage/reducer'
 import { useGetNumberOfErc721Transfers } from 'hooks/useSubgraph'
 import { isAddress, shortenAddress } from 'utils'
 import useENSAddress from 'hooks/useENSAddress'
@@ -199,9 +199,9 @@ export default function ItemPageModal({
     const [success, setSuccess] = useState<boolean>(false)
     const [waitingForTX, setwaitingForTX] = useState<boolean>(false)
 
-    const [modalAction, setAction] = useSaleActionManager()
+    const [modalIntention, setModelIntention] = useItemPageModalIntentionManager()
 
-    const [selectedOrder, setOrder] = useSaleOrderManager()
+    const [selectedOrder, setOrder] = useItemPageOrderManager()
 
     const isOwner = nft.owner.toLowerCase() == account?.toLocaleLowerCase()
 
@@ -248,7 +248,7 @@ export default function ItemPageModal({
 
     //Once the wrapped Order has been created, ask for the user's signature.
     useEffect(() => {
-        if (!wrappedOrder?.order || !account || !chainId || !proxyAddress?.result || !proxyAllowance?.result || signing || modalAction) return
+        if (!wrappedOrder?.order || !account || !chainId || !proxyAddress?.result || !proxyAllowance?.result || signing || modalIntention) return
 
         if (proxyAddress?.result[0] == AddressZero || (isOwner ? proxyAllowance?.result[0] == false : (proxyAllowance?.result[0]._hex != MaxUint256._hex))) return
         setSigning(true)
@@ -293,7 +293,7 @@ export default function ItemPageModal({
         } else {
             setWrappedOrder(undefined)
             setSuccess(false)
-            setAction(null)
+            setModelIntention(null)
             setOrder(null)
             setENSDestination('')
             setDestination('')
@@ -439,7 +439,7 @@ export default function ItemPageModal({
                 </UpperSection>
             )
         }
-        if (modalAction == SaleAction.MATCH) {
+        if (modalIntention == ModalIntention.MATCH) {
             if (!selectedOrder || !chainId || !orbitdb || !orbitdb?.db) return
             return (
                 <MatchView
@@ -462,7 +462,7 @@ export default function ItemPageModal({
                 />
             )
         }
-        if (modalAction == SaleAction.TRANSFER) {
+        if (modalIntention == ModalIntention.TRANSFER) {
             return (
                 <UpperSection>
                     <CloseIcon onClick={toggleWalletModal}>
@@ -545,7 +545,7 @@ export default function ItemPageModal({
 
             )
         }
-        if (modalAction == SaleAction.CANCEL) {
+        if (modalIntention == ModalIntention.CANCEL) {
             return (
                 <UpperSection>
                     <CloseIcon onClick={toggleWalletModal}>
@@ -921,7 +921,7 @@ export default function ItemPageModal({
 
     return (
         <Modal isOpen={walletModalOpen} onDismiss={toggleWalletModal} minHeight={false} maxHeight={90}>
-            <Confetti start={success && modalAction == SaleAction.MATCH} />
+            <Confetti start={success && modalIntention == ModalIntention.MATCH} />
             <Wrapper>{getModalContent()}</Wrapper>
         </Modal>
     )

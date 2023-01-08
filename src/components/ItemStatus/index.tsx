@@ -1,16 +1,16 @@
 import { useWeb3React } from '@web3-react/core'
 import { formatEther } from 'ethers/lib/utils'
 import React from 'react'
-import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
-import { SaleAction } from 'state/sale/reducer'
+import { useItemPageModalIntentionManager, useItemPageOrderManager } from 'state/itemPage/hooks'
+import { ModalIntention } from 'state/itemPage/reducer'
 import { OrderWrapperInterface } from 'stateswap/orders/types'
 import { timeDifference } from 'utils/relativeTime'
 
 export const ItemStatus = ({ loading, itemPageModalToggle, owner, address, identifier, buyOrders, sellOrders }: { loading: boolean, itemPageModalToggle: () => void, owner: string, address: string, identifier: string, buyOrders: OrderWrapperInterface[], sellOrders: OrderWrapperInterface[] }) => {
 
     const { account } = useWeb3React()
-    const [_, setAction] = useSaleActionManager()
-    const [__, setOrder] = useSaleOrderManager()
+    const [_, setModalIntention] = useItemPageModalIntentionManager()
+    const [__, setOrder] = useItemPageOrderManager()
     const isOwner = account?.toLowerCase() == owner.toLowerCase()
 
     return (
@@ -30,7 +30,7 @@ export const ItemStatus = ({ loading, itemPageModalToggle, owner, address, ident
                         <a onClick={() => {
                             itemPageModalToggle()
                             if (!isOwner) {
-                                setAction(SaleAction.MATCH)
+                                setModalIntention(ModalIntention.MATCH)
                                 setOrder(sellOrders[0])
                             }
                         }} className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 cursor-pointer'>
@@ -41,7 +41,7 @@ export const ItemStatus = ({ loading, itemPageModalToggle, owner, address, ident
                         <a onClick={() => {
                             itemPageModalToggle()
                             if (isOwner) {
-                                setAction(SaleAction.CANCEL)
+                                setModalIntention(ModalIntention.CANCEL)
                                 setOrder(sellOrders[0])
                             }
                         }} className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 cursor-pointer'>

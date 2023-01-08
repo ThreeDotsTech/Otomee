@@ -6,18 +6,21 @@ import { ThemedText } from '../../theme'
 import { ReactComponent as Checkmark } from '../../assets/svg/checkmark.svg'
 import { ContractTransaction, utils } from 'ethers'
 import { AddressZero, MaxUint256 } from '@ethersproject/constants'
-import { CallState } from '@uniswap/redux-multicall/dist/types'
-import { StateswapRegistry } from 'abis/types/StateswapRegistry'
+import OrbitContext from 'state/orbitdb/orbitContext'
 import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg'
 import { createAny_AnyOrder } from 'hooks/useExchangeContract'
 import { splitSignature } from 'ethers/lib/utils'
 import { NULL_SIG, ZERO_BYTES32 } from 'constants/misc'
-import { useERC20Contract, useERC721Contract, useStateswapExchangeContract } from 'hooks/useContract'
+import { useERC20Contract, useERC721Contract, useStateswapExchangeContract, useStateswapRegistryContract } from 'hooks/useContract'
 import { wrap } from 'utils/exchangeWrapper'
 import { WETH_ADDRESSES } from 'constants/addresses'
 import { Call } from 'stateswap/verifiers'
 import DocumentStore from 'orbit-db-docstore'
-import { NftInterface } from 'types/nft'
+import { useItemPageNFT, useItemPageOrderManager } from 'state/itemPage/hooks'
+import { useWeb3React } from '@web3-react/core'
+import { useSingleCallResult } from 'state/multicall/hooks'
+import { useContext, useMemo, useState } from 'react'
+import { useItemPageModalToggle } from 'state/application/hooks'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -65,47 +68,42 @@ const UpperSection = styled.div`
   }
 `
 
-export function MatchView(
+export function MatchView({
+    success,
+    setSuccess
+}:
     {
-        nft,
-        registryContract,
-        waitingForTX,
-        success,
-        proxyAddress,
-        ethWETH,
-        isOwner,
-        selectedOrder,
-        proxyAllowance,
-        chainId,
-        account,
-        db,
-        setSuccess,
-        setwaitingForTX,
-        setethWETH,
-        toggleWalletModal,
-    }: {
-        nft: NftInterface,
-        account: string | null | undefined,
-        chainId: number,
-        setwaitingForTX: React.Dispatch<React.SetStateAction<boolean>>,
-        registryContract: StateswapRegistry | null,
-        waitingForTX: boolean,
-        success: boolean,
-        proxyAllowance: CallState,
-        proxyAddress: CallState,
-        ethWETH: boolean,
-        isOwner: boolean,
-        selectedOrder: OrderWrapperInterface,
-        setSuccess: React.Dispatch<React.SetStateAction<boolean>>,
-        setethWETH: React.Dispatch<React.SetStateAction<boolean>>
-        toggleWalletModal: () => void,
-        db: DocumentStore<OrderWrapperInterface>
-    }
-) {
+        success: boolean
+        setSuccess: React.Dispatch<React.SetStateAction<boolean>>
+    }) {
+    const nft = useItemPageNFT()
+    const { account, chainId } = useWeb3React()
+    const { orbitdb } = useContext(OrbitContext)
+    const [selectedOrder, setOrder] = useItemPageOrderManager()
+    if (!selectedOrder || !nft || !account || !orbitdb || !orbitdb?.db) return (<></>)
+
+    const isOwner = nft.owner.toLowerCase() == account?.toLocaleLowerCase()
+
     const erc721c = useERC721Contract(nft.contractAddress)
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
+    const registryContract = useStateswapRegistryContract(true)
     const exchangec = useStateswapExchangeContract(true)
     const exchange = wrap(exchangec)
+
+    const toggleWalletModal = useItemPageModalToggle()
+
+    const accountArgument = useMemo(
+        () => [account],
+        [account])
+    const proxyAddress = useSingleCallResult(registryContract, 'proxies', accountArgument)
+    const allowanceArgument = useMemo(
+        () => [account, proxyAddress.result && proxyAddress.result[0]],
+        [account, chainId, proxyAddress?.result])
+    const proxyAllowance = useSingleCallResult(isOwner ? erc721c : erc20c, isOwner ? 'isApprovedForAll' : 'allowance', allowanceArgument)
+
+    const [ethWETH, setethWETH] = useState<boolean>(false)
+    const [waitingForTX, setwaitingForTX] = useState<boolean>(false)
+
     return (
         <UpperSection>
             <CloseIcon onClick={toggleWalletModal}>
@@ -350,6 +348,7 @@ export function MatchView(
                                         waitingForTX ?
                                             <Spinner /> :
                                             <button onClick={() => {
+
                                                 if (proxyAddress?.result == undefined) return
                                                 //Check if the user is registered on Stateswap
                                                 if (proxyAddress?.result[0] == AddressZero) {
@@ -371,8 +370,9 @@ export function MatchView(
                                                         .then(
                                                             (tx: ContractTransaction) => {
                                                                 tx.wait(1).then(() => {
+                                                                    if (!orbitdb || !orbitdb?.db) return
                                                                     //delete order from orbitdb
-                                                                    db.del(selectedOrder.hash);
+                                                                    orbitdb.db.del(selectedOrder.hash);
                                                                     setSuccess(true);
                                                                     setwaitingForTX(false);
                                                                 })
@@ -446,8 +446,9 @@ export function MatchView(
                                                     .then(
                                                         (tx: ContractTransaction) => {
                                                             tx.wait(1).then(() => {
+                                                                if (!orbitdb || !orbitdb?.db) return
                                                                 //delete order from orbitdb
-                                                                db.del(selectedOrder.hash);
+                                                                orbitdb.db.del(selectedOrder.hash);
                                                                 setSuccess(true);
                                                                 setwaitingForTX(false);
                                                             })
@@ -468,8 +469,6 @@ export function MatchView(
                 </div>
             </div>
         </UpperSection >
-
-
     )
 
 }

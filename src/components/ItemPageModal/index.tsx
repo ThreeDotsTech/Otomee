@@ -139,8 +139,6 @@ const LinkCard = styled(Card)`
 `
 
 export const MAKE_OFFER_VIEWS = {
-    OPTIONS: 'options',
-    OPTIONS_SECONDARY: 'options_secondary',
     OFFER: 'offer',
     PENDING: 'pending',
     LEGAL: 'legal',
@@ -221,8 +219,6 @@ export default function ItemPageModal({
     })
 
     const { numberOfErc721Transfers,
-        numberOfErc721Transferserror,
-        numberOfErc721Transfersfetching,
         numberOfErc721TransfersExecuteQuery } = useGetNumberOfErc721Transfers(account ?? '', isAddress(destination) ? destination : address ?? '')
 
     const onChangeDestination = (event: any) => {
@@ -440,26 +436,8 @@ export default function ItemPageModal({
             )
         }
         if (modalIntention == ModalIntention.MATCH) {
-            if (!selectedOrder || !chainId || !orbitdb || !orbitdb?.db) return
             return (
-                <MatchView
-                    nft={nft}
-                    account={account}
-                    chainId={chainId}
-                    setwaitingForTX={setwaitingForTX}
-                    registryContract={registryContract}
-                    waitingForTX={waitingForTX}
-                    success={success}
-                    proxyAllowance={proxyAllowance}
-                    proxyAddress={proxyAddress}
-                    ethWETH={ethWETH}
-                    isOwner={isOwner}
-                    selectedOrder={selectedOrder}
-                    setethWETH={setethWETH}
-                    toggleWalletModal={toggleWalletModal}
-                    setSuccess={setSuccess}
-                    db={orbitdb.db}
-                />
+                <MatchView success={success} setSuccess={setSuccess} />
             )
         }
         if (modalIntention == ModalIntention.TRANSFER) {
@@ -884,7 +862,7 @@ export default function ItemPageModal({
                             <AutoRow style={{ flexWrap: 'nowrap' }}>
                                 <ThemedText.Black fontSize={14}>
 
-                                    By connecting a wallet, you agree to Otomee’{' '}
+                                    By connecting a wallet, you agree to Otomee’s{' '}
                                     Terms of Service and
                                     acknowledge that you have read and understand the Otomee{' '}
                                     Protocol Disclaimer.

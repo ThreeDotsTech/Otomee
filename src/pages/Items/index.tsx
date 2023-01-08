@@ -1,6 +1,6 @@
 
 import AppBody from 'pages/AppBody'
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Linkify from 'react-linkify';
 import useENSName from 'hooks/useENSName'
@@ -50,7 +50,6 @@ const ItemsPage = () => {
     const [sellOrders, setSellOrders] = useState<OrderWrapperInterface[]>([])
 
     const [_, setModalIntention] = useItemPageModalIntentionManager()
-    const [__, setOrder] = useItemPageOrderManager()
 
     const isOwner = nft.owner.toLowerCase() == account?.toLocaleLowerCase()
 

@@ -68,7 +68,7 @@ const ItemsPage = () => {
         return function () {
             setNFT(null)
         }
-    }, [nft.loading])
+    }, [nft.loading, nft.owner])
 
     //Get buy offers for this NFT, sort by price.
     useEffect(() => {

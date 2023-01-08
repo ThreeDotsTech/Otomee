@@ -2,20 +2,12 @@ import { SupportedNFTInterfaces } from "constants/ERC165"
 import { DEFAULT_ENS_METADATA_URL_PREFIX, OPENSEA_METADATA_API_URL_PREFIX } from "constants/misc"
 import { METHODS } from "http"
 import { useEffect, useMemo, useState } from "react"
+import { NftInterface, NftTypes } from "types/nft"
 import uriToHttp from "utils/uriToHttp"
 import { useERC721Data } from "./useNFTName"
 import { useERC1155Uri, useERC721Uri } from "./useNFTuri"
 
-export function useNFTMetadata(address: string, id: string): {
-    title: string,
-    image: string,
-    animation: string,
-    description: string,
-    loading: boolean,
-    attributesList?: any,
-    collectionName: string,
-    owner: string
-} {
+export function useNFTMetadata(address: string, id: string): NftInterface {
     const memoid = useMemo(() => id, [id])
 
     const erc721 = useERC721Uri(address, memoid, false)
@@ -27,17 +19,14 @@ export function useNFTMetadata(address: string, id: string): {
 
     const [image, setImage] = useState('')
     const [collectionName, setcollectionName] = useState('')
-    const [title, setTitle] = useState('')
+    const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [animation, setAnimation] = useState('')
     const [LoadingMemo, setLoadingMemo] = useState(false)
     const [AttributesList, setAttributesList] = useState<any>(undefined)
 
-
-
-
     function setAttributes({ image_, name_, image_url, description_, attributes, animation_, animationUrl_ }: { image_?: string, name_?: string, image_url?: string, description_?: string, attributes?: string, animationUrl_?: string, animation_?: string }) {
-        name_ ? setTitle(name_) : setTitle(memoid)
+        name_ ? setName(name_) : setName(memoid)
         image_ ? setImage(uriToHttp(image_)[0]) : image_url && setImage(uriToHttp(image_url)[0])
         animation_ && setAnimation(uriToHttp(animation_)[0])
         animationUrl_ && setAnimation(uriToHttp(animationUrl_)[0])
@@ -89,7 +78,7 @@ export function useNFTMetadata(address: string, id: string): {
                     break;
                 default:
                     console.log('Irregular collection found:' + address)
-                    ercData.name && (setTitle(ercData.name))
+                    ercData.name && (setName(ercData.name))
                     break;
             }
         }
@@ -133,7 +122,7 @@ export function useNFTMetadata(address: string, id: string): {
                     })
 
         } else if (failed && !loading && !ercData.loading) {
-            ercData.name ? setTitle(ercData.name + " # " + Number(memoid.split('/')[1])) : setTitle("Couldn't fetch NFT's URI fromName")
+            ercData.name ? setName(ercData.name + " # " + Number(memoid.split('/')[1])) : setName("Couldn't fetch NFT's URI fromName")
         }
 
         ercData.name && (setcollectionName(ercData.name))
@@ -145,19 +134,22 @@ export function useNFTMetadata(address: string, id: string): {
             setAttributesList([])
             setLoadingMemo(false)
             setDescription('')
-            setTitle('')
+            setName('')
         }
     }, [ercData.name, http, loading, uri,])
 
     return {
-        title: title,
-        image: image,
-        animation: animation,
+        contractAddress: address,
+        id: id,
+        name: name,
+        imageURL: image,
+        animationURL: animation,
         description: description,
         loading: loading || LoadingMemo,
         attributesList: AttributesList ?? null,
         collectionName: collectionName,
-        owner: erc721.owner || ''
+        owner: erc721.owner || '',
+        type: erc721.uri ? NftTypes.ERC721 : erc1155.uri ? NftTypes.ERC115 : NftTypes.UNSUPPORTED_TYPE
     }
 
 }

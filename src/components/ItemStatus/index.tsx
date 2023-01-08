@@ -1,17 +1,18 @@
 import { useWeb3React } from '@web3-react/core'
 import { formatEther } from 'ethers/lib/utils'
 import React from 'react'
-import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
-import { SaleAction } from 'state/sale/reducer'
+import { useItemPageModalIntentionManager, useItemPageNFT, useItemPageOrderManager } from 'state/itemPage/hooks'
+import { ModalIntention } from 'state/itemPage/reducer'
 import { OrderWrapperInterface } from 'stateswap/orders/types'
 import { timeDifference } from 'utils/relativeTime'
 
-export const ItemStatus = ({ loading, itemPageModalToggle, owner, address, identifier, buyOrders, sellOrders }: { loading: boolean, itemPageModalToggle: () => void, owner: string, address: string, identifier: string, buyOrders: OrderWrapperInterface[], sellOrders: OrderWrapperInterface[] }) => {
+export const ItemStatus = ({ itemPageModalToggle, buyOrders, sellOrders }: { itemPageModalToggle: () => void, buyOrders: OrderWrapperInterface[], sellOrders: OrderWrapperInterface[] }) => {
 
     const { account } = useWeb3React()
-    const [_, setAction] = useSaleActionManager()
-    const [__, setOrder] = useSaleOrderManager()
-    const isOwner = account?.toLowerCase() == owner.toLowerCase()
+    const [_, setModalIntention] = useItemPageModalIntentionManager()
+    const [__, setOrder] = useItemPageOrderManager()
+    const nft = useItemPageNFT()
+    const isOwner = account?.toLowerCase() == nft?.owner.toLowerCase()
 
     return (
         <>
@@ -22,15 +23,15 @@ export const ItemStatus = ({ loading, itemPageModalToggle, owner, address, ident
                         <p>Sale ends in {timeDifference(sellOrders[0].order.expirationTime / 1000)}. </p>
                     </div>
                     <div className="flex flex-col h-full items-center justify-center my-5  ">
-                        {loading ? <h2 className="bg-gray-600 animate-pulse h-20 mt-3 w-3/5"></h2> : <p className="text-5xl font-semibold text-black mb-0 text-ellipsis pb-2">{formatEther(sellOrders[0].price)} ETH</p>}
-                        {loading ? <h2 className="bg-gray-400 animate-pulse h-5 w-3/12"></h2> : <span className="text-lg font-semibold text-black mb-0 text-ellipsis"></span>}
+                        {nft?.loading ? <h2 className="bg-gray-600 animate-pulse h-20 mt-3 w-3/5"></h2> : <p className="text-5xl font-semibold text-black mb-0 text-ellipsis pb-2">{formatEther(sellOrders[0].price)} ETH</p>}
+                        {nft?.loading ? <h2 className="bg-gray-400 animate-pulse h-5 w-3/12"></h2> : <span className="text-lg font-semibold text-black mb-0 text-ellipsis"></span>}
                     </div>
 
                     <div className="flex h-full items-center justify-center my-3">
                         <a onClick={() => {
                             itemPageModalToggle()
                             if (!isOwner) {
-                                setAction(SaleAction.MATCH)
+                                setModalIntention(ModalIntention.MATCH)
                                 setOrder(sellOrders[0])
                             }
                         }} className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 cursor-pointer'>
@@ -41,7 +42,7 @@ export const ItemStatus = ({ loading, itemPageModalToggle, owner, address, ident
                         <a onClick={() => {
                             itemPageModalToggle()
                             if (isOwner) {
-                                setAction(SaleAction.CANCEL)
+                                setModalIntention(ModalIntention.CANCEL)
                                 setOrder(sellOrders[0])
                             }
                         }} className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 cursor-pointer'>
@@ -64,7 +65,7 @@ export const ItemStatus = ({ loading, itemPageModalToggle, owner, address, ident
                         </>
                     }
                     <div className="flex h-full items-center justify-center my-3">
-                        {account?.toLowerCase() != owner.toLowerCase() ?
+                        {account?.toLowerCase() != nft?.owner.toLowerCase() ?
                             <a onClick={itemPageModalToggle} className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs h-10 w-1/2 hover:scale-95 mx-5 cursor-pointer'>
                                 <div className="flex flex-row justify-center  items-center w-full h-full px-2 py-3 backdrop-saturate-150 rounded-full ">
                                     <p className=" text-white font-semibold text-base">Make offer</p>

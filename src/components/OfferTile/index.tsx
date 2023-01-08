@@ -9,10 +9,10 @@ import styled from 'styled-components'
 import Identicon from 'components/Identicon'
 import { utils } from 'ethers'
 import { useWeb3React } from '@web3-react/core'
-import { useSaleActionManager, useSaleOrderManager } from 'state/sale/hooks'
+import { useItemPageModalIntentionManager, useItemPageOrderManager } from 'state/itemPage/hooks'
 import { OrderWrapperInterface } from 'stateswap/orders/types'
 import { useItemPageModalToggle } from 'state/application/hooks'
-import { SaleAction } from 'state/sale/reducer'
+import { ModalIntention } from 'state/itemPage/reducer'
 
 const AvatarWrapper = styled.div`
 border-radius: 9999px;
@@ -26,8 +26,8 @@ const OfferTile = ({ order, owner }: { order: OrderWrapperInterface, owner?: str
     const { account } = useWeb3React()
     const isOwner = account?.toLowerCase() == owner?.toLowerCase()
     const ENSNameMaker = useENSName(order.maker)
-    const [_, setAction] = useSaleActionManager()
-    const [__, setOrder] = useSaleOrderManager()
+    const [_, setModalIntention] = useItemPageModalIntentionManager()
+    const [__, setOrder] = useItemPageOrderManager()
     const itemPageModalToggle = useItemPageModalToggle()
     return (
         <div className={'flex w-full py-2 items-center overflow-hidden odd:bg-white even:bg-slate-50 justify-evenly h-10'}>
@@ -51,7 +51,7 @@ const OfferTile = ({ order, owner }: { order: OrderWrapperInterface, owner?: str
                 <a
                     onClick={() => {
                         itemPageModalToggle()
-                        setAction(SaleAction.MATCH)
+                        setModalIntention(ModalIntention.MATCH)
                         setOrder(order)
                     }}
                     className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs w-max hover:scale-95 cursor-pointer'>

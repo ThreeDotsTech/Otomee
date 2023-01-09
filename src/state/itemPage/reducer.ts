@@ -17,6 +17,7 @@ export interface ItemPageState {
 export enum ModalIntention {
     CANCEL,
     MATCH,
+    ACCEPT,
     TRANSFER
 }
 

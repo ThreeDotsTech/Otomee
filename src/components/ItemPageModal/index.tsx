@@ -45,6 +45,7 @@ import Identicon from 'components/Identicon'
 import { MatchView } from './Match'
 import Confetti from 'components/Confetti'
 import { NftInterface } from 'types/nft'
+import { AccepptView } from './Accept'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -438,6 +439,11 @@ export default function ItemPageModal({
         if (modalIntention == ModalIntention.MATCH) {
             return (
                 <MatchView success={success} setSuccess={setSuccess} />
+            )
+        }
+        if (modalIntention == ModalIntention.ACCEPT) {
+            return (
+                <AccepptView success={success} setSuccess={setSuccess} />
             )
         }
         if (modalIntention == ModalIntention.TRANSFER) {

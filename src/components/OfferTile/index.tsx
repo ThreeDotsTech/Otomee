@@ -51,7 +51,7 @@ const OfferTile = ({ order, owner }: { order: OrderWrapperInterface, owner?: str
                 <a
                     onClick={() => {
                         itemPageModalToggle()
-                        setModalIntention(ModalIntention.MATCH)
+                        setModalIntention(ModalIntention.ACCEPT)
                         setOrder(order)
                     }}
                     className='transition ease-in-out delay-100 bg-gradient-to-r from-TDRed via-TDBlue to-TDGreen rounded-full text-xs w-max hover:scale-95 cursor-pointer'>

@@ -1,192 +1,96 @@
-import { STATESWAP_ATOMIZICER_ADDRESSES, STATESWAP_REGISTRY_ADDRESSES, STATESWAP_VERIFIER_ADDRESSES, WETH_ADDRESSES } from "constants/addresses";
-import { defaultAbiCoder, parseEther, randomBytes } from "ethers/lib/utils";
-import { ArrayToNumber } from "utils";
-import { encodeFunctionSignature } from "utils/encoders";
-import { CallInterface, OrderInterface, OrderType, OrderWrapperInterface } from "stateswap/orders/types";
-import { Erc20, Erc721, StateswapAtomicizer } from "abis/types";
+import { STATESWAP_REGISTRY_ADDRESSES, STATESWAP_VERIFIER_ADDRESSES, WETH_ADDRESSES } from "constants/addresses";
+import { OrderInterface, OrderType, OrderWrapperInterface } from "stateswap/orders/types";
 import { BigNumber } from "ethers";
 import { VerifierCalls, Extradata, Selectors } from "stateswap/verifiers";
 import { Order } from "stateswap/orders/Order";
 import { OrderWrapper } from "stateswap/orders/OrderWrapper";
-import { MaxUint256 } from '@ethersproject/constants'
-function createCalldata_ERC20_Transfer_with_Fee(
-    chainId: number,
-    erc20Address: string,
-    erc20Amount: BigNumber,
-    protocolFee: BigNumber,
-    royalty: BigNumber,
-    protocolFeeReceiver: string,
-    royaltyReceiver: string) {
-    const selectorCall = encodeFunctionSignature(
-        "sequenceExact(bytes,address[7],uint8,uint256[6],bytes)"
-    );
-    const callSelector1 = encodeFunctionSignature(
-        "transferERC20Exact(bytes,address[7],uint8,uint256[6],bytes)"
-    );
-    const callExtradata1 = defaultAbiCoder.encode(
-        ["address", "uint256"],
-        [erc20Address, erc20Amount.sub(protocolFee).sub(royalty)]
-    );
-    const callSelector2 = encodeFunctionSignature(
-        "transferERC20ExactTo(bytes,address[7],uint8,uint256[6],bytes)"
-    );
-    const callExtradata2 = defaultAbiCoder.encode(
-        ["address", "uint256", "address"],
-        [erc20Address, protocolFee, protocolFeeReceiver]
-    );
-    const callSelector3 = encodeFunctionSignature(
-        "transferERC20ExactTo(bytes,address[7],uint8,uint256[6],bytes)"
-    );
-    const callExtradata3 = defaultAbiCoder.encode(
-        ["address", "uint256", "address"],
-        [erc20Address, royalty, royaltyReceiver]
-    );
 
-    const extradataCall = defaultAbiCoder.encode(
-        ["address[]", "uint256[]", "bytes4[]", "bytes"],
-        [
-            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
-            [
-                (callExtradata1.length - 2) / 2,
-                (callExtradata2.length - 2) / 2,
-                (callExtradata3.length - 2) / 2,
-            ],
-            [callSelector1, callSelector2, callSelector3],
-            callExtradata1 +
-            callExtradata2.slice(2) +
-            callExtradata3.slice(2),
-        ]
-    );
-
-    return [selectorCall, extradataCall]
-}
-
-export function create_ERC20_ERC721_OfferWithFees({
+export function createErc20_Erc721Order({
     maker,
-    owner,
     erc721Address,
-    tokenId,
     erc20Address,
+    tokenId,
     erc20Amount,
-    protocolFee,
-    protocolFeeReceiver,
-    creatorFee,
-    creatorFeeReceiver,
     expirationTime,
     chainId,
-    erc20c,
-    atomicizerc
 }: {
     maker: string,
-    owner: string,
     erc721Address: string,
     tokenId: string,
     erc20Address: string,
     erc20Amount: BigNumber,
-    protocolFee: number,
-    protocolFeeReceiver: string,
-    creatorFee: number,
-    creatorFeeReceiver: string,
     expirationTime: number,
     chainId: number,
-    erc20c: Erc20 | null,
-    atomicizerc: StateswapAtomicizer | null
 }): OrderWrapperInterface {
-    const fee1 = ((erc20Amount.mul(protocolFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
-    const fee2 = ((erc20Amount.mul(creatorFee).mul(10).div(1000)).add(5)).div(10) //ProtocolFee
 
+    const splitSelector = Selectors.util.split;
 
-    const selector = encodeFunctionSignature(
-        "split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)"
-    );
+    // Call should be an ERC20 transfer to recipient
 
-    // Call should be an ERC20 transfer to recipient + fees
-
-    const [selectorCall, extradataCall] = createCalldata_ERC20_Transfer_with_Fee(chainId, erc20Address, erc20Amount, fee1, fee2, protocolFeeReceiver, creatorFeeReceiver)
+    const [erc20TransferSelector, erc20TransferExtradata] = VerifierCalls.ERC20_Transfer(erc20Address, erc20Amount);
 
     // Countercall should be an ERC721 transfer
 
-    const [selectorCountercall, extradataCountercall] = VerifierCalls.ERC721_Transfer(erc721Address, tokenId)
+    const [erc721TransferSelector, erc721TransferExtradata] = VerifierCalls.ERC721_Transfer(erc721Address, tokenId);
 
-    const extradata = defaultAbiCoder.encode(
-        ["address[2]", "bytes4[2]", "bytes", "bytes"],
-        [
-            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
-            [selectorCall, selectorCountercall],
-            extradataCall,
-            extradataCountercall,
-        ]
-    );
+    const splitExtradata = Extradata.util.split({
+        addressCall: STATESWAP_VERIFIER_ADDRESSES[chainId],
+        selectorCall: erc20TransferSelector,
+        extradataCall: erc20TransferExtradata,
+        addressCountercall: STATESWAP_VERIFIER_ADDRESSES[chainId],
+        selectorCountercall: erc721TransferSelector,
+        extradataCountercall: erc721TransferExtradata
+    });
 
-    //Registry will be retrieved and assigned later.
-    const order: OrderInterface = {
-        registry: STATESWAP_REGISTRY_ADDRESSES[chainId],
-        maker: maker,
-        verifierTarget: STATESWAP_VERIFIER_ADDRESSES[chainId],
-        verifierSelector: selector,
-        verifierExtradata: extradata,
-        maximumFill: 1,
-        listingTime: 0,
-        expirationTime: expirationTime,
-        salt: ArrayToNumber(randomBytes(31))._hex,
-    }
+    const order = new Order()
+        .setRegistry(STATESWAP_REGISTRY_ADDRESSES[chainId])
+        .setMaker(maker)
+        .setVerifierTarget(STATESWAP_VERIFIER_ADDRESSES[chainId])
+        .setVerifierSelector(splitSelector)
+        .setVerifierExtradata(splitExtradata)
+        .setMaximumFill(1)
+        .setListingTime(0)
+        .setExpirationTime(expirationTime)
 
-
-
-    if (!erc20c || !atomicizerc) {
-        throw new Error("Invalid contracts");
-    }
-
-    const c1 = erc20c.interface.encodeFunctionData("transferFrom", [maker, owner, erc20Amount.sub(fee1).sub(fee2)])
-    const c2 = erc20c.interface.encodeFunctionData("transferFrom", [maker, protocolFeeReceiver, fee1])
-    const c3 = erc20c.interface.encodeFunctionData("transferFrom", [maker, creatorFeeReceiver, fee2])
-
-    const callData = atomicizerc.interface.encodeFunctionData("atomicize", [
-        [erc20Address, erc20Address, erc20Address],
-        [0, 0, 0],
-        [(c1.length - 2) / 2, (c2.length - 2) / 2, (c3.length - 2) / 2],
-        c1 + c2.slice(2) + c3.slice(2)]
-    )
-
-    const call = {
-        data: callData,
-        howToCall: 1,
-        target: STATESWAP_ATOMIZICER_ADDRESSES[chainId]
-    };
-
-    const orderWrapper: OrderWrapperInterface = {
-        call: call,
-        collection: erc721Address,
-        hash: undefined,
-        maker: maker,
-        order: order,
-        price: erc20Amount._hex,
-        signature: undefined,
-        target: tokenId,
-        type: OrderType.ERC20_FOR_ERC721,
-    }
+    const orderWrapper = new OrderWrapper(order)
+        .setCollection(erc721Address)
+        .setPrice(erc20Amount._hex)
+        .setTarget(tokenId)
+        .setType(OrderType.ERC20_FOR_ERC721)
 
     return orderWrapper
 
 }
 
-export function createOrderAcceptAny(maker: string, chainId: number): OrderInterface {
-    const anySelector = Selectors.util.any
-    const anyExtradata = Extradata.util.any()
-    const order = new Order()
-        .setRegistry(STATESWAP_REGISTRY_ADDRESSES[chainId])
-        .setMaker(maker)
-        .setVerifierTarget(STATESWAP_VERIFIER_ADDRESSES[chainId])
-        .setVerifierSelector(anySelector)
-        .setVerifierExtradata(anyExtradata)
-        .setMaximumFill(1)
-        .setListingTime(0)
-        .setExpirationTime(Number.MAX_SAFE_INTEGER - 1);
-    return order
+export function createWETH_Erc721Order(
+    { maker,
+        erc721Address,
+        tokenId,
+        wethAmount,
+        expirationTime,
+        chainId,
+    }: {
+        maker: string,
+        erc721Address: string,
+        tokenId: string,
+        wethAmount: BigNumber,
+        expirationTime: number,
+        chainId: number,
+    }): OrderWrapperInterface {
+    return createErc20_Erc721Order(
+        {
+            maker: maker,
+            erc721Address: erc721Address,
+            erc20Address: WETH_ADDRESSES[chainId],
+            tokenId: tokenId,
+            erc20Amount: wethAmount,
+            expirationTime: expirationTime,
+            chainId: chainId
+        }
+    )
 }
 
-
-export function create_ERC721_WETH_OR_ETH_Offer({
+export function createErc721_WethOrEthOffer({
     maker,
     erc721Address,
     tokenId,
@@ -249,16 +153,6 @@ export function create_ERC721_WETH_OR_ETH_Offer({
         }
     );
 
-    // TODO: Verify Extradata.util.or implementation (compara to this)
-    /*     defaultAbiCoder.encode(
-            ['address[]', 'bytes4[]', 'uint256[]', 'bytes'],
-            [[STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
-            [splitSelector, splitSelector],
-            [(extradataERC721ForETH.length - 2) / 2, (extradataERC721ForERC20.length - 2) / 2],
-            extradataERC721ForETH + extradataERC721ForERC20.slice(2)]
-        ) */
-
-
     //Build order
     const order = new Order()
         .setRegistry(STATESWAP_REGISTRY_ADDRESSES[chainId])
@@ -280,6 +174,75 @@ export function create_ERC721_WETH_OR_ETH_Offer({
     return orderWrapper
 }
 
+export function createAny_AnyOrder(maker: string, chainId: number): OrderInterface {
+    const anySelector = Selectors.util.any
+    const anyExtradata = Extradata.util.any()
+    const order = new Order()
+        .setRegistry(STATESWAP_REGISTRY_ADDRESSES[chainId])
+        .setMaker(maker)
+        .setVerifierTarget(STATESWAP_VERIFIER_ADDRESSES[chainId])
+        .setVerifierSelector(anySelector)
+        .setVerifierExtradata(anyExtradata)
+        .setMaximumFill(1)
+        .setListingTime(0)
+        .setExpirationTime(Number.MAX_SAFE_INTEGER - 1);
+    return order
+}
+
+/*
+function createCalldata_ERC20_Transfer_with_Fee(
+    chainId: number,
+    erc20Address: string,
+    erc20Amount: BigNumber,
+    protocolFee: BigNumber,
+    royalty: BigNumber,
+    protocolFeeReceiver: string,
+    royaltyReceiver: string) {
+    const selectorCall = encodeFunctionSignature(
+        "sequenceExact(bytes,address[7],uint8,uint256[6],bytes)"
+    );
+    const callSelector1 = encodeFunctionSignature(
+        "transferERC20Exact(bytes,address[7],uint8,uint256[6],bytes)"
+    );
+    const callExtradata1 = defaultAbiCoder.encode(
+        ["address", "uint256"],
+        [erc20Address, erc20Amount.sub(protocolFee).sub(royalty)]
+    );
+    const callSelector2 = encodeFunctionSignature(
+        "transferERC20ExactTo(bytes,address[7],uint8,uint256[6],bytes)"
+    );
+    const callExtradata2 = defaultAbiCoder.encode(
+        ["address", "uint256", "address"],
+        [erc20Address, protocolFee, protocolFeeReceiver]
+    );
+    const callSelector3 = encodeFunctionSignature(
+        "transferERC20ExactTo(bytes,address[7],uint8,uint256[6],bytes)"
+    );
+    const callExtradata3 = defaultAbiCoder.encode(
+        ["address", "uint256", "address"],
+        [erc20Address, royalty, royaltyReceiver]
+    );
+
+    const extradataCall = defaultAbiCoder.encode(
+        ["address[]", "uint256[]", "bytes4[]", "bytes"],
+        [
+            [STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId], STATESWAP_VERIFIER_ADDRESSES[chainId]],
+            [
+                (callExtradata1.length - 2) / 2,
+                (callExtradata2.length - 2) / 2,
+                (callExtradata3.length - 2) / 2,
+            ],
+            [callSelector1, callSelector2, callSelector3],
+            callExtradata1 +
+            callExtradata2.slice(2) +
+            callExtradata3.slice(2),
+        ]
+    );
+
+    return [selectorCall, extradataCall]
+}*/
+
+/*
 export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
     maker,
     erc721Address,
@@ -376,8 +339,6 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
         throw new Error("Invalid contracts");
     }
 
-
-
     const orderWrapper: OrderWrapperInterface = {
         call: undefined,
         collection: erc721Address.toLowerCase(),
@@ -389,7 +350,6 @@ export function create_ERC721_ERC20_OR_ETH_OfferWithFees({
         target: tokenId,
         type: OrderType.ERC721_FOR_ETH_OR_WETH,
     }
-
     return orderWrapper
 
-}
+}*/

@@ -10,7 +10,7 @@ import { multicall } from './multicall/instance'
 import transactions from './transactions/reducer'
 import user from './user/reducer'
 
-import sale from './sale/reducer'
+import itemPage from './itemPage/reducer'
 
 const PERSISTED_KEYS: string[] = ['user', 'transactions']
 
@@ -21,7 +21,7 @@ const store = configureStore({
     transactions,
     multicall: multicall.reducer,
     logs,
-    sale
+    itemPage
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: true, serializableCheck: false })

@@ -1,24 +1,27 @@
 import { OrderType, OrderWrapperInterface } from 'stateswap/orders/types'
 import styled from 'styled-components/macro'
-import { MAKE_OFFER_VIEWS } from '.'
 import { ReactComponent as Close } from '../../assets/images/x.svg'
-import { ArrowLeft } from 'react-feather'
 import Row from 'components/Row'
 import { ThemedText } from '../../theme'
 import { ReactComponent as Checkmark } from '../../assets/svg/checkmark.svg'
 import { ContractTransaction, utils } from 'ethers'
 import { AddressZero, MaxUint256 } from '@ethersproject/constants'
-import { CallState } from '@uniswap/redux-multicall/dist/types'
-import { StateswapRegistry } from 'abis/types/StateswapRegistry'
+import OrbitContext from 'state/orbitdb/orbitContext'
 import { ReactComponent as Spinner } from '../../assets/svg/spinner.svg'
-import { createOrderAcceptAny } from 'hooks/useExchangeContract'
+import { createAny_AnyOrder } from 'hooks/useExchangeContract'
 import { splitSignature } from 'ethers/lib/utils'
 import { NULL_SIG, ZERO_BYTES32 } from 'constants/misc'
-import { useERC20Contract, useERC721Contract, useStateswapExchangeContract } from 'hooks/useContract'
+import { useERC20Contract, useERC721Contract, useStateswapExchangeContract, useStateswapRegistryContract } from 'hooks/useContract'
 import { wrap } from 'utils/exchangeWrapper'
 import { WETH_ADDRESSES } from 'constants/addresses'
 import { Call } from 'stateswap/verifiers'
 import DocumentStore from 'orbit-db-docstore'
+import { useItemPageNFT, useItemPageOrderManager } from 'state/itemPage/hooks'
+import { useWeb3React } from '@web3-react/core'
+import { useSingleCallResult } from 'state/multicall/hooks'
+import { useContext, useMemo, useState } from 'react'
+import { useItemPageModalToggle } from 'state/application/hooks'
+
 const CloseIcon = styled.div`
   position: absolute;
   right: 1rem;
@@ -65,71 +68,42 @@ const UpperSection = styled.div`
   }
 `
 
-const HoverText = styled.div`
-  text-decoration: none;
-  color: ${({ theme }) => theme.text1};
-  display: flex;
-  align-items: center;
-
-  :hover {
-    cursor: pointer;
-  }
-`
-
-
-export function MatchView(
+export function MatchView({
+    success,
+    setSuccess
+}:
     {
-        name,
-        registryContract,
-        waitingForTX,
-        success,
-        proxyAddress,
-        ethWETH,
-        isOwner,
-        selectedOrder,
-        collectionName,
-        imageURL,
-        animationURL,
-        proxyAllowance,
-        chainId,
-        account,
-        contractAddress,
-        db,
-        setSuccess,
-        setwaitingForTX,
-        setethWETH,
-        setWalletView,
-        toggleWalletModal,
-        setWrappedOrder
-    }: {
-        name: string,
-        contractAddress: string,
-        account: string | null | undefined,
-        chainId: number,
-        setwaitingForTX: React.Dispatch<React.SetStateAction<boolean>>,
-        registryContract: StateswapRegistry | null,
-        waitingForTX: boolean,
-        success: boolean,
-        proxyAllowance: CallState,
-        proxyAddress: CallState,
-        ethWETH: boolean,
-        isOwner: boolean,
-        selectedOrder: OrderWrapperInterface,
-        collectionName: string,
-        imageURL: string,
-        animationURL: string,
-        setSuccess: React.Dispatch<React.SetStateAction<boolean>>,
-        setethWETH: React.Dispatch<React.SetStateAction<boolean>>
-        toggleWalletModal: () => void,
-        setWalletView: React.Dispatch<React.SetStateAction<string>>,
-        setWrappedOrder: React.Dispatch<React.SetStateAction<OrderWrapperInterface | undefined>>,
-        db: DocumentStore<OrderWrapperInterface>
-    }
-) {
-    const erc721c = useERC721Contract(contractAddress)
+        success: boolean
+        setSuccess: React.Dispatch<React.SetStateAction<boolean>>
+    }) {
+    const nft = useItemPageNFT()
+    const { account, chainId } = useWeb3React()
+    const { orbitdb } = useContext(OrbitContext)
+    const [selectedOrder, setOrder] = useItemPageOrderManager()
+    if (!selectedOrder || !nft || !account || !orbitdb || !orbitdb?.db) return (<></>)
+
+    const isOwner = nft.owner.toLowerCase() == account?.toLocaleLowerCase()
+
+    const erc721c = useERC721Contract(nft.contractAddress)
     const erc20c = useERC20Contract(WETH_ADDRESSES[chainId ?? 0], true)
+    const registryContract = useStateswapRegistryContract(true)
     const exchangec = useStateswapExchangeContract(true)
     const exchange = wrap(exchangec)
+
+    const toggleWalletModal = useItemPageModalToggle()
+
+    const accountArgument = useMemo(
+        () => [account],
+        [account])
+    const proxyAddress = useSingleCallResult(registryContract, 'proxies', accountArgument)
+    const allowanceArgument = useMemo(
+        () => [account, proxyAddress.result && proxyAddress.result[0]],
+        [account, chainId, proxyAddress?.result])
+    const proxyAllowance = useSingleCallResult(isOwner ? erc721c : erc20c, isOwner ? 'isApprovedForAll' : 'allowance', allowanceArgument)
+
+    const [ethWETH, setethWETH] = useState<boolean>(false)
+    const [waitingForTX, setwaitingForTX] = useState<boolean>(false)
+
     return (
         <UpperSection>
             <CloseIcon onClick={toggleWalletModal}>
@@ -147,11 +121,11 @@ export function MatchView(
                 <div className='flex justify-start w-full mb-4'>
                     <div className="flex">
                         <div className="flex w-5/12 justify-center overflow-x-hidden aspect-square rounded-lg relative bg-slate-200">
-                            {(imageURL == '' && animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={imageURL} />}
+                            {(nft.imageURL == '' && nft.animationURL != '') ? <video className="bg-black h-full aspect-video object-contain" src={nft.animationURL} autoPlay muted loop /> : <img className="h-full object-contain" src={nft.imageURL} />}
                         </div>
                         <div className="flex flex-col items-start w-7/12 justify-center ml-2 px-2">
-                            <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{collectionName}</p>
-                            <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{name}</p>
+                            <p className="text-base font-semibold text-gray-600 mb-0 truncate grow-0 mt-1">{nft.collectionName}</p>
+                            <p className="text-lg font-semibold text-gray-900 mb-2 text-clip ">{nft.name}</p>
                             <div className=" flex flex-col  items-start text-lg font-semibold text-gray-900 mb-0 text-clip grow border-t w-full justify-start">
                                 <div className="flex ">
                                     <p className='text-gray-600 mr-2'>Price: </p>
@@ -374,6 +348,7 @@ export function MatchView(
                                         waitingForTX ?
                                             <Spinner /> :
                                             <button onClick={() => {
+
                                                 if (proxyAddress?.result == undefined) return
                                                 //Check if the user is registered on Stateswap
                                                 if (proxyAddress?.result[0] == AddressZero) {
@@ -388,20 +363,16 @@ export function MatchView(
                                                 } else {
                                                     if (!chainId || !account || !selectedOrder.signature || !erc721c) return
                                                     //Ready to match ETH for ERC721
-                                                    const orderAcceptAny = createOrderAcceptAny(account, chainId)
+                                                    const orderAcceptAny = createAny_AnyOrder(account, chainId)
                                                     const emptyCall = Call.utils.empty(chainId)
                                                     const erc721TransferCall = Call.erc721.transferFrom(selectedOrder.maker, account, selectedOrder.target, erc721c, selectedOrder.collection)
-
-                                                    console.log(orderAcceptAny)
-                                                    console.log(emptyCall)
-                                                    console.log(selectedOrder)
-                                                    console.log(erc721TransferCall)
                                                     exchange?.stateswapWith(selectedOrder.order, selectedOrder.signature, erc721TransferCall, orderAcceptAny, splitSignature(NULL_SIG), emptyCall, ZERO_BYTES32, { value: selectedOrder.price })
                                                         .then(
                                                             (tx: ContractTransaction) => {
                                                                 tx.wait(1).then(() => {
+                                                                    if (!orbitdb || !orbitdb?.db) return
                                                                     //delete order from orbitdb
-                                                                    db.del(selectedOrder.hash);
+                                                                    orbitdb.db.del(selectedOrder.hash);
                                                                     setSuccess(true);
                                                                     setwaitingForTX(false);
                                                                 })
@@ -468,20 +439,16 @@ export function MatchView(
                                             } else {
                                                 //Ready to accept the order
                                                 if (!chainId || !account || !selectedOrder.signature || !erc721c || !erc20c) return
-                                                const OrderAcceptAny = createOrderAcceptAny(account, chainId)
+                                                const OrderAcceptAny = createAny_AnyOrder(account, chainId)
                                                 const erc20TransferCall = Call.erc20.transferFrom(account, selectedOrder.maker, selectedOrder.price, erc20c, WETH_ADDRESSES[chainId])
                                                 const erc721TransferCall = Call.erc721.transferFrom(selectedOrder.maker, account, selectedOrder.target, erc721c, selectedOrder.collection)
-
-                                                console.log(OrderAcceptAny)
-                                                console.log(erc20TransferCall)
-                                                console.log(selectedOrder)
-                                                console.log(erc721TransferCall)
                                                 exchange?.stateswap(selectedOrder.order, selectedOrder.signature, erc721TransferCall, OrderAcceptAny, splitSignature(NULL_SIG), erc20TransferCall, ZERO_BYTES32)
                                                     .then(
                                                         (tx: ContractTransaction) => {
                                                             tx.wait(1).then(() => {
+                                                                if (!orbitdb || !orbitdb?.db) return
                                                                 //delete order from orbitdb
-                                                                db.del(selectedOrder.hash);
+                                                                orbitdb.db.del(selectedOrder.hash);
                                                                 setSuccess(true);
                                                                 setwaitingForTX(false);
                                                             })
@@ -502,8 +469,6 @@ export function MatchView(
                 </div>
             </div>
         </UpperSection >
-
-
     )
 
 }

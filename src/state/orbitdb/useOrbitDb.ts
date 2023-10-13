@@ -1,5 +1,4 @@
-import { IPFS } from "ipfs/src";
-import Multiaddr from 'multiaddr'
+import { IPFS } from "ipfs";
 import OrbitDB from "orbit-db";
 import DocumentStore from "orbit-db-docstore";
 import Store from "orbit-db-store";
@@ -55,7 +54,8 @@ function useOrbitDb<T>(address: string, options: IStoreOptions = {}, orbit: Orbi
       setInterval(() => {
         ipfs.swarm.peers().then((networkPeers: any) => {
           ipfs.pubsub.peers(newDb.address.toString()).then((dbPeers: any) => {
-            //console.log("Peers: ", dbPeers.length, '/', networkPeers.length, dbPeers)
+            console.log("Peers: ", dbPeers.length, '/', networkPeers.length, dbPeers)
+            console.log(networkPeers)
             if (dbPeers.length == 0) {
               //console.log('No swarm peers for more than ', tries * 10, ' seconds')
               setTries(prevState => prevState + 1)

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import Multiaddr from 'multiaddr'
+import { multiaddr } from '@multiformats/multiaddr'
+import * as IPFS from 'ipfs-core'
+import * as IPFSTypes from 'ipfs-core-types'
 
-import * as IPFS from "ipfs";
 
-
-function useIpfs(config: any): { ipfs: IPFS.IPFS | null } {
+function useIpfs(config: any): { ipfs: IPFSTypes.IPFS | null } {
   const [ipfs, setIpfs] = useState<IPFS.IPFS>();
 
   useEffect(() => {
@@ -16,15 +16,19 @@ function useIpfs(config: any): { ipfs: IPFS.IPFS | null } {
         setIpfs(window.ipfsLoaded);
         return;
       } else {
-        IPFS.create(config).then((newIPFS: IPFS.IPFS) => {
+        IPFS.create(config).then((newIPFS) => {
           if (typeof window !== "undefined") window.ipfsLoaded = newIPFS;
           console.log("IPFS initialized.");
-          newIPFS.swarm.connect(Multiaddr('/dns4/ipfs.otomee.com/tcp/4002/wss/p2p/12D3KooWLqkemDeZKr2AcCQZAQRS2L5tgWRbp2cJUzHPdTSuyVSH'))
-            .then(() => console.log('Connected with Otomee ipfs bootstrap node'))
+          newIPFS.swarm.connect(multiaddr('/dns4/ipfs.otomee.com/tcp/4003/wss/p2p/QmWDLjWxkGP3y9eb9hTc2maFmBBAGnrtxZhoLhPP5gaNGD'))
+            .then(() => {
+              console.log('Connected with Otomee ipfs bootstrap node')
+              setIpfs(newIPFS)
+            }
+            )
             .catch((reason: any) => console.error('Failed to connect with Otomee ipfs bootstrap node', reason))
           newIPFS.id().then((id: any) => {
-            console.log("IPFS: Connected as ", id);
-            setIpfs(newIPFS)
+            console.log("IPFS: Connected as ", id['id']);
+
           })
         });
       }

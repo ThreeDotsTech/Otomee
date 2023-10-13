@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@metamask/jazzicon": "^2.0.0",
+    "@multiformats/multiaddr": "^12.1.0",
     "@reach/dialog": "0.10.3",
     "@reach/portal": "0.10.3",
     "@reduxjs/toolkit": "^1.7.1",
@@ -38,13 +39,13 @@
     "ethers": "^5.5.2",
     "graphql": "^16.2.0",
     "graphql-tag": "^2.12.6",
-    "ipfs": "^0.52.0",
-    "ipfs-core-types": "^0.9.0",
-    "ipfsd-ctl": "^7.1.0",
+    "ipfs": "^0.66.0",
+    "ipfs-core-types": "^0.14.0",
+    "ipfsd-ctl": "^13.0.0",
     "logplease": "^1.2.15",
     "node-fetch": "^3.2.0",
-    "orbit-db": "^0.26.0",
-    "orbit-db-identity-provider": "^0.4.0",
+    "orbit-db": "^0.29.0",
+    "orbit-db-identity-provider": "^0.5.0",
     "patch-package": "^6.4.7",
     "path-browserify": "^1.0.1",
     "polished": "^4.1.3",
@@ -84,17 +85,19 @@
     "@testing-library/dom": ">=7.21.4",
     "@babel/core": "^7.0.0-0"
   },
-  "proxy": "http://127.0.0.1:8080/",
   "scripts": {
     "contracts:compile:abi": "typechain --target ethers-v5 --out-dir src/abis/types \"./src/abis/**/*.json\"",
     "proxy": "node cors-server.js",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts --max_old_space_size=4096 start",
+    "build": "react-scripts --max_old_space_size=4096 build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "extract": "lingui extract",
     "compile": "lingui compile",
     "postinstall": "yarn patch-package"
+  },
+  "browser": {
+    "fs": false
   },
   "browserslist": {
     "production": [

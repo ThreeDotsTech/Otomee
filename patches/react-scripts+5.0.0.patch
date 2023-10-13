@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-scripts/config/webpack.config.js b/node_modules/react-scripts/config/webpack.config.js
-index 2b1b3bb..23c265d 100644
+index 2b1b3bb..82134a7 100644
 --- a/node_modules/react-scripts/config/webpack.config.js
 +++ b/node_modules/react-scripts/config/webpack.config.js
 @@ -143,34 +143,34 @@ module.exports = function (webpackEnv) {
@@ -85,11 +85,12 @@ index 2b1b3bb..23c265d 100644
          // Support React Native Web
          // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
          'react-native': 'react-native-web',
-@@ -343,6 +344,14 @@ module.exports = function (webpackEnv) {
+@@ -343,6 +344,15 @@ module.exports = function (webpackEnv) {
            babelRuntimeRegenerator,
          ]),
        ],
 +      fallback: {
++        fs: false,
 +        assert: require.resolve('assert'),
 +        buffer: require.resolve('buffer'),
 +        stream: require.resolve('stream-browserify'),
@@ -100,7 +101,7 @@ index 2b1b3bb..23c265d 100644
      },
      module: {
        strictExportPresence: true,
-@@ -449,8 +458,8 @@ module.exports = function (webpackEnv) {
+@@ -449,8 +459,8 @@ module.exports = function (webpackEnv) {
                  // @remove-on-eject-end
                  plugins: [
                    isEnvDevelopment &&
@@ -111,7 +112,7 @@ index 2b1b3bb..23c265d 100644
                  ].filter(Boolean),
                  // This is a feature of `babel-loader` for webpack (not Babel itself).
                  // It enables caching results in ./node_modules/.cache/babel-loader/
-@@ -601,6 +610,7 @@ module.exports = function (webpackEnv) {
+@@ -601,6 +611,7 @@ module.exports = function (webpackEnv) {
          },
        ].filter(Boolean),
      },
@@ -119,7 +120,7 @@ index 2b1b3bb..23c265d 100644
      plugins: [
        // Generates an `index.html` file with the <script> injected.
        new HtmlWebpackPlugin(
-@@ -612,19 +622,19 @@ module.exports = function (webpackEnv) {
+@@ -612,19 +623,19 @@ module.exports = function (webpackEnv) {
            },
            isEnvProduction
              ? {
@@ -152,7 +153,7 @@ index 2b1b3bb..23c265d 100644
              : undefined
          )
        ),
-@@ -632,8 +642,8 @@ module.exports = function (webpackEnv) {
+@@ -632,8 +643,8 @@ module.exports = function (webpackEnv) {
        // a network request.
        // https://github.com/facebook/create-react-app/issues/5358
        isEnvProduction &&
@@ -163,7 +164,7 @@ index 2b1b3bb..23c265d 100644
        // Makes some environment variables available in index.html.
        // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
        // <link rel="icon" href="%PUBLIC_URL%/favicon.ico">
-@@ -652,21 +662,21 @@ module.exports = function (webpackEnv) {
+@@ -652,21 +663,21 @@ module.exports = function (webpackEnv) {
        // Experimental hot reloading for React .
        // https://github.com/facebook/react/tree/main/packages/react-refresh
        isEnvDevelopment &&
@@ -195,7 +196,7 @@ index 2b1b3bb..23c265d 100644
        // Generate an asset manifest file with the following content:
        // - "files" key: Mapping of all asset filenames to their corresponding
        //   output file so that tools can pick it up without having to parse
-@@ -703,89 +713,95 @@ module.exports = function (webpackEnv) {
+@@ -703,89 +714,95 @@ module.exports = function (webpackEnv) {
        // Generate a service worker script that will precache, and keep up to date,
        // the HTML & assets that are part of the webpack build.
        isEnvProduction &&

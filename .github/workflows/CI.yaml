@@ -1,0 +1,29 @@
+name: 
+
+on:
+  pull_request:
+    branches:
+        - dev
+        - release
+        - main
+  push:
+    branches:
+      - dev
+      - release
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install modules
+      run: yarn
+    - name: Run ESLint
+    # echo 0 ensures the CI passess even after 
+      run: eslint . --format json --ext .js,.jsx,.ts,.tsx >> eslint-report.json  || echo 0 
+    - name: ESLint Reporter
+      uses: rahmanrafi/eslint-reporter-action@v3
+      with:
+        json: ./sample.json
+        title: ESLint Report

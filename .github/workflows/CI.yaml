@@ -25,5 +25,5 @@ jobs:
     - name: ESLint Reporter
       uses: rahmanrafi/eslint-reporter-action@v3
       with:
-        json: ./sample.json
+        json: ./eslint-report.json
         title: ESLint Report

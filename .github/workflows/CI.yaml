@@ -18,10 +18,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install modules
-      run: npm i eslint @typescript-eslint/eslint-plugin@latest eslint-plugin-react @typescript-eslint/parser
+      run: yarn add eslint @typescript-eslint/eslint-plugin@latest eslint-plugin-react @typescript-eslint/parser
     - name: Run ESLint
     # echo 0 ensures the CI passess even after 
-      run: node_modules/eslint/bin/eslint.js . . --format json --ext .js,.jsx,.ts,.tsx --output-file eslint-report.json  || echo 0 
+      run: yarn run eslint . --format json --ext .js,.jsx,.ts,.tsx --output-file eslint-report.json  || echo 0 
     - name: ESLint Reporter
       uses: rahmanrafi/eslint-reporter-action@v3
       with:

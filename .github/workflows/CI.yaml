@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install modules
-      run: yarn install eslint
+      run: yarn global add eslint
     - name: Run ESLint
     # echo 0 ensures the CI passess even after 
       run: yarn run eslint . --format json --ext .js,.jsx,.ts,.tsx >> eslint-report.json  || echo 0 

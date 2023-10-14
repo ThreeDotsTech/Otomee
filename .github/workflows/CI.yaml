@@ -21,7 +21,7 @@ jobs:
       run: yarn global add eslint
     - name: Run ESLint
     # echo 0 ensures the CI passess even after 
-      run: eslint . --format json --ext .js,.jsx,.ts,.tsx >> eslint-report.json  || echo 0 
+      run: eslint . --format json --ext .js,.jsx,.ts,.tsx > eslint-report.json  || echo 0 
     - name: cat report file
     # echo 0 ensures the CI passess even after 
       run: cat eslint-report.json  || echo 0 
